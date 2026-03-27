@@ -15,5 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Activities Completion Course Monitoring';
+<<<<<<<< HEAD:lang/en/block_completion_monitor.php
 $string['blocktitle'] = 'Activity monitoring';
 $string['viewreport'] = 'View tracking data' ;
+========
+$string['blocktitle'] = 'Suivi des activités';
+$string['viewreport'] = 'Voir toutes les données de suivi' ;
+>>>>>>>> 90b858b (feat(block_completion_monitor):#MEN-1214 block HTML structure + setup):lang/en/block_completion_monitor.php
