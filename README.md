@@ -1,4 +1,4 @@
-# activities-completion-course-monitoring
+# completion_monitor
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://git-pic1.support-ent.fr/mentor/mentor-modules/blocks/activities-completion-course-monitoring.git
+git remote add origin https://git-pic1.support-ent.fr/mentor/mentor-modules/blocks/completion_monitor.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-* [Set up project integrations](https://git-pic1.support-ent.fr/mentor/mentor-modules/blocks/activities-completion-course-monitoring/-/settings/integrations)
+* [Set up project integrations](https://git-pic1.support-ent.fr/mentor/mentor-modules/blocks/completion_monitor/-/settings/integrations)
 
 ## Collaborate with your team
 
