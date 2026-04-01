@@ -8,6 +8,6 @@ include:
     inputs:
       submodule_branch: $CI_COMMIT_REF_NAME
       submodule_path: "blocks/completion_monitor"
-      # submodule_testsuite: "mentor_blocks_completion_monitor_testsuite"
+      submodule_testsuite: "mentor_blocks_completion_monitor_testsuite"
   - component: $CI_SERVER_FQDN/mentor/mentor-modules/ci/mentor-modules-ci/mentor-submodules-deploy@1.0.0
   - component: $CI_SERVER_FQDN/mentor/mentor-modules/ci/mentor-modules-ci/mentor-submodules-reverse-github@1.0.0
