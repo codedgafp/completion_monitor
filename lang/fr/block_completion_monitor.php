@@ -16,4 +16,8 @@
 
 $string['pluginname'] = 'Suivi des d\'achèvement des activités du cours';
 $string['blocktitle'] = 'Suivi des activités';
+$string['activities_completion_course_monitoring:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des activités et de la complétion du cours';
+
 $string['viewreport'] = 'Voir toutes les données de suivi' ;
+$string['showmore'] = 'Voir plus';
+$string['showless'] = 'Réduire';
