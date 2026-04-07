@@ -1,13 +1,17 @@
 <div id="block-completion-monitor-{{uniqid}}" class="block-completion-monitor">
     <div class="completion_monitor-custom-header">
-        <h2 class="block_title">
-            {{#str}} blocktitle, block_completion_monitor {{/str}}
-        </h2>
+        <div class="main-content">
+            <h2 class="block_title">
+                {{#str}} blocktitle, block_completion_monitor {{/str}}
+            </h2>
 
-        {{#display_percentage}}
-            {{> block_completion_monitor/progress-header/progress-circle }}
-            {{> block_completion_monitor/progress-header/course-progress-details }}
-        {{/display_percentage}}
+            {{#display_percentage}}
+                <div class="block-progress-informations">
+                    {{> block_completion_monitor/progress-header/progress-circle }}
+                    {{> block_completion_monitor/progress-header/course-progress-details }}
+                </div>
+            {{/display_percentage}}
+        </div>
 
         <div class="open-block">
             <button class="button-showless-showmore">

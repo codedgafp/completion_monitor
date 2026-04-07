@@ -37,28 +37,50 @@
         justify-content: space-between;
         align-items: center;
 
-        .block_title {
-            margin: 0;
-            color: black;
-        }
+        .main-content {
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-right: 10px;
 
-        #completion-monitor-circle-progress {
-            position: relative;
-            width: 80px;
-
-            span {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 0.9rem;
-                text-align: center;
+            @media(min-width: @screen-sm) {
+                max-width: 560px;
             }
-        }
 
-        @media(max-width: @screen-sm) {
+            .block_title {
+                margin: 0;
+                color: black;
+            }
+
+            .block-progress-informations {
+                display: flex;
+                align-items: center;
+
+                #completion-monitor-circle-progress {
+                    position: relative;
+                    width: 80px;
+
+                    span {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 0.9rem;
+                        text-align: center;
+                    }
+                }
+            }
+
             .completion-monitor-progress-details {
-                display: none;
+                @media(max-width: @screen-sm) {
+                    display: none;
+                }
+
+                @media(min-width: @screen-sm) {
+                    margin-left: 10px;
+                }
             }
         }
 
