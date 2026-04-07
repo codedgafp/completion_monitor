@@ -16,7 +16,11 @@
 
 $string['pluginname'] = 'Activities Completion Course Monitoring';
 $string['blocktitle'] = 'Activity monitoring';
-$string['viewreport'] = 'View tracking data';
 $string['activities_completion_course_monitoring:addinstance'] = 'Allow adding the Activities Completion Course Monitoring block';
+
+$string['viewreport'] = 'View tracking data';
 $string['showmore'] = 'Show more';
 $string['showless'] = 'Show less';
+
+$string['courseprogress_percentage'] = 'Course {$a}% complete';
+$string['courseprogress_step'] = '{$a->activitiescompleted} out of {$a->activitiestocompleted} required tasks completed';

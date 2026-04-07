@@ -1,4 +1,4 @@
-@screen-sm: 767px;
+@import "variables.less";
 
 .block_completion_monitor {
     border-bottom: 3px solid #000 !important;
@@ -7,6 +7,25 @@
     border-right: 1px solid #dee2e6 !important;
     margin-left: 24px;
     margin-right: 24px;
+
+    .card-text.content {
+        margin-top: 0 !important;
+    }
+
+    .completion-monitor-progress-details {
+        p {
+            margin-bottom: 0.5rem;
+        }
+
+        .course-progress-percentage {
+            font-size: 18px;
+            color: @progress-main-blue-color;
+        }
+
+        .course-progress-step {
+            font-size: 14px;
+        }
+    }
 
     @media(max-width: @screen-sm) {
         margin-left: 12px;
@@ -19,9 +38,28 @@
         align-items: center;
 
         .block_title {
-            flex: 1;
             margin: 0;
             color: black;
+        }
+
+        #completion-monitor-circle-progress {
+            position: relative;
+            width: 80px;
+
+            span {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 0.9rem;
+                text-align: center;
+            }
+        }
+
+        @media(max-width: @screen-sm) {
+            .completion-monitor-progress-details {
+                display: none;
+            }
         }
 
         .open-block {
@@ -67,6 +105,12 @@
 
         &.hidden-block {
             display: none;
+        }
+
+        @media(min-width: @screen-sm) {
+            .completion-monitor-progress-details {
+                display: none;
+            }
         }
     }
 

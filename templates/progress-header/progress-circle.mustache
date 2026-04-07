@@ -1,0 +1,13 @@
+<div id="completion-monitor-circle-progress">
+    <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="{{ percentage_circle_data.radius }}" fill="none" stroke="#E3E3FD" stroke-width="8"/>
+        <circle cx="50" cy="50" r="{{ percentage_circle_data.radius }}" fill="none" stroke="#000091"
+            stroke-width="8"
+            stroke-dasharray="{{ percentage_circle_data.circumference  }}"
+            stroke-dashoffset="{{ percentage_circle_data.offset  }}"
+            stroke-linecap="round"
+            transform="rotate(-90 50 50)"
+        />
+    </svg>
+    <span>{{ percentage_circle_data.percentage }}%</span>
+</div>

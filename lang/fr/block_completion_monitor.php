@@ -21,3 +21,6 @@ $string['activities_completion_course_monitoring:addinstance'] = 'Autoriser l\'a
 $string['viewreport'] = 'Voir toutes les données de suivi' ;
 $string['showmore'] = 'Voir plus';
 $string['showless'] = 'Réduire';
+
+$string['courseprogress_percentage'] = 'Cours complété à {$a}%';
+$string['courseprogress_step'] = '{$a->activitiescompleted} sur {$a->activitiestocompleted} activités requises terminées';
