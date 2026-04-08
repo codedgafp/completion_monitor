@@ -3,6 +3,7 @@
 namespace block_completion_monitor\service;
 
 use block_completion_monitor\helper\progress;
+use block_completion_monitor\model\block_instance_record;
 use block_completion_monitor\repository\completion_monitor_repository;
 
 /**
@@ -48,7 +49,7 @@ class completion_monitor_service
 
         $completions = self::get_progress($this->course, $activities, $userid, $submissions);
 
-        $completecount = count(array_filter($activities, function($activity) use ($completions) {
+        $completecount = count(array_filter($activities, function ($activity) use ($completions) {
             return $completions[$activity['id']] == COMPLETION_COMPLETE || $completions[$activity['id']] == COMPLETION_COMPLETE_PASS;
         }));
 
@@ -178,5 +179,44 @@ class completion_monitor_service
         }
 
         return $activities;
+    }
+
+    public function activities_has_completion(int $courseId): bool
+    {
+        return $this->accmrepository->activity_has_completion($courseId);
+    }
+
+    public function add_block_to_course(): void
+    {
+        global $DB;
+
+        $context = \context_course::instance($this->course->id);
+
+        $exists = $this->accmrepository->block_instance_exists($context->id);
+
+        if (!$exists) {
+            $blockRecord = new block_instance_record(                
+                blockname: 'completion_monitor',
+                parentcontextid: $context->id,
+                pagetypepattern: 'course-view-*'
+            );
+
+            $DB->insert_record('block_instances', $blockRecord->buildRecord());
+        }
+    }
+
+    public function remove_block_from_course(): void
+    {
+        global $DB;
+
+        $context = \context_course::instance($this->course->id);
+        $exists = $this->accmrepository->block_instance_exists($context->id);
+
+        if ($exists) {
+            $DB->delete_records('block_instances', [
+                'blockname'       => 'completion_monitor',
+                'parentcontextid' => $context->id
+            ]);
+        }
     }
 }

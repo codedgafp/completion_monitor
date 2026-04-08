@@ -102,7 +102,8 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
     /**
      * @covers $this->repository->get_user_course_submissions
      */
-    public function test_get_user_course_submissions() {
+    public function test_get_user_course_submissions()
+    {
         self::setAdminUser();
 
         // Create course.
@@ -133,8 +134,11 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
 
         // Set the passing grade.
         $item = \grade_item::fetch([
-            'courseid' => $course->id, 'itemtype' => 'mod',
-            'itemmodule' => 'assign', 'iteminstance' => $instance->id, 'outcomeid' => null,
+            'courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => $instance->id,
+            'outcomeid' => null,
         ]);
         $item->gradepass = 50;
         $item->update();
@@ -152,5 +156,63 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         self::assertCount(1, $usersubmissions);
 
         self::resetAllData();
+    }
+
+    /**
+    * @covers activity_has_completion
+    */
+    public function test_activity_has_completion()
+    {
+        self::setAdminUser();
+
+        // Create course.
+        $courserecord = new stdClass();
+        $courserecord->enablecompletion = 1;
+        $course = $this->getDataGenerator()->create_course($courserecord);
+        $hasCompletion = $this->repository->activity_has_completion($course->id);
+
+        self::assertFalse($hasCompletion);
+        $record = new stdClass();
+        $record->course = $course;
+        $record->completion = 1;
+        $this->getDataGenerator()->create_module('url', $record);
+
+        $hasCompletion = $this->repository->activity_has_completion($course->id);
+        self::assertTrue($hasCompletion);
+    }
+
+    /**
+    * @covers block_instance_exists
+    */
+    public function test_block_instance_exists()
+    {
+        global $DB;
+        self::setAdminUser();
+
+        // Create course.
+        $courserecord = new stdClass();
+        $courserecord->enablecompletion = 1;
+        $course = $this->getDataGenerator()->create_course($courserecord);
+
+        $context = \context_course::instance($course->id);
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertFalse($exists);
+
+        $record = new \stdClass();
+        $record->blockname          = 'completion_monitor';
+        $record->parentcontextid    = $context->id;
+        $record->showinsubcontexts  = 0;
+        $record->pagetypepattern    = 'course-view-*';
+        $record->subpagepattern     = null;
+        $record->defaultregion      = 'top-block';
+        $record->defaultweight      = 1;
+        $record->timecreated        = time();
+        $record->timemodified       = time();
+
+        $DB->insert_record('block_instances', $record);
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertTrue($exists);
     }
 }

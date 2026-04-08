@@ -254,4 +254,43 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         self::assertEquals($url2cm->id, current($requiredactivities)['id']);
         self::assertEquals('url', current($requiredactivities)['type']);
     }
+
+
+    /**
+    * @covers add_block_to_course
+    */
+    public function test_add_block_to_course()
+    {
+        global $DB;
+
+        $context = \context_course::instance($this->course->id);
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertFalse($exists);
+
+        $this->service->add_block_to_course();
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertTrue($exists);
+        
+    }
+
+    /**
+    * @covers remove_block_from_course
+    */
+    public function test_remove_block_from_course()
+    {
+        $context = \context_course::instance($this->course->id);
+
+        $this->service->add_block_to_course();
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertTrue($exists);
+
+        $this->service->remove_block_from_course();
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertFalse($exists);
+    }
+
 }

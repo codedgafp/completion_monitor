@@ -220,7 +220,7 @@ class completion_monitor_repository
         }
 
         $sqlconcat = $this->db->sql_concat('qa.userid', "'-'", 'c.id');
-        $sql ="SELECT $sqlconcat AS id,
+        $sql = "SELECT $sqlconcat AS id,
                 qa.userid, c.id AS cmid,
                 (CASE WHEN qa.sumgrades IS NULL THEN 0 ELSE 1 END) AS graded
             FROM {quiz_attempts} qa
@@ -279,4 +279,25 @@ class completion_monitor_repository
 
         return $this->db->get_records_sql($sql, $params);
     }
+
+    public function activity_has_completion(int $courseId): bool
+    {
+        return $this->db->record_exists_select(
+            'course_modules',
+            'course = :course AND completion <> :none',
+            [
+                'course' => $courseId,
+                'none' => COMPLETION_TRACKING_NONE
+            ]
+        );
+    }
+
+    public function block_instance_exists(int $contextId): bool
+    {
+        return  $this->db->record_exists('block_instances', [
+            'blockname' => 'completion_monitor',
+            'parentcontextid' => $contextId
+        ]);
+    }
+
 }
