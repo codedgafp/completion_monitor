@@ -2,6 +2,8 @@
 
 namespace block_completion_monitor\helper;
 
+use block_completion_monitor\model\activity_details;
+
 defined('MOODLE_INTERNAL') || die();
 
 trait progress
@@ -21,8 +23,8 @@ trait progress
         $completioninfo = new \completion_info($course);
         $cm = new \stdClass();
 
-        foreach ($activities as $activity) {
-            $cm->id = $activity['id'];
+        foreach ($activities as /** @var activity_details */ $activity) {
+            $cm->id = $activity->get_id();
             $completion = $completioninfo->get_data($cm, true, $userid);
             $submission = $submissions["$userid-$cm->id"] ?? null;
 

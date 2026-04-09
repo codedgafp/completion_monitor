@@ -1,6 +1,7 @@
 <?php
 namespace block_completion_monitor\output;
 
+use block_completion_monitor\model\template_context;
 use plugin_renderer_base;
 use moodle_url;
 
@@ -18,9 +19,11 @@ class renderer extends plugin_renderer_base
         return has_capability('report/progress:view', $context);
     }
 
-    public function render_block(array $templatecontext): string
+    public function render_block(): string
     {
         global $COURSE;
+
+        $templatecontext = new template_context($COURSE);
 
         $reporturl = $this->can_access_report() ? new moodle_url(
             '/report/progress/index.php',
@@ -32,7 +35,7 @@ class renderer extends plugin_renderer_base
             [
                 "reporturl" => $reporturl,
                 "can_access_report" => $this->can_access_report(),
-                ...$templatecontext
+                ...$templatecontext->get_template_context()
             ]
         );
     }
@@ -42,11 +45,11 @@ class renderer extends plugin_renderer_base
      * @param \block_base $accm_block
      * @return string
      */
-    public function render_block_with_controls(\block_base $accm_block, array $templatecontext): string
+    public function render_block_with_controls(\block_base $accm_block): string
     {
         global $PAGE, $OUTPUT;
 
-        $contenttext = $this->render_block($templatecontext);
+        $contenttext = $this->render_block();
 
         $bc = new block_contents();
 

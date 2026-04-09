@@ -4,6 +4,9 @@ use block_completion_monitor\repository\completion_monitor_repository;
 
 defined('MOODLE_INTERNAL');
 
+global $CFG;
+require_once($CFG->dirroot . '/mod/assign/tests/fixtures/testable_assign.php');
+
 class block_completion_monitor_repository_testcase extends advanced_testcase
 {
     /**
@@ -82,9 +85,6 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         $assign->testable_apply_grade_to_user((object) ['grade' => $grade], $student->id, $attempt);
     }
 
-    /**
-     * @covers $this->repository->get_grade_exclusions
-     */
     public function test_grade_exclusions_ok()
     {
         self::setAdminUser();
@@ -94,14 +94,11 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         $coursedata->shortname = 'Course1';
         $coursedata->fullname = 'Course1';
 
-        $course = create_course($coursedata);
+        $course = $this->getDataGenerator()->create_course($coursedata);
 
         self::assertCount(0, $this->repository->get_grade_exclusions($course->id));
     }
 
-    /**
-     * @covers $this->repository->get_user_course_submissions
-     */
     public function test_get_user_course_submissions()
     {
         self::setAdminUser();
@@ -158,9 +155,6 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         self::resetAllData();
     }
 
-    /**
-    * @covers activity_has_completion
-    */
     public function test_activity_has_completion()
     {
         self::setAdminUser();
@@ -181,9 +175,6 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         self::assertTrue($hasCompletion);
     }
 
-    /**
-    * @covers block_instance_exists
-    */
     public function test_block_instance_exists()
     {
         global $DB;

@@ -3,6 +3,7 @@
 namespace block_completion_monitor\service;
 
 use block_completion_monitor\helper\progress;
+use block_completion_monitor\model\activity_details;
 use block_completion_monitor\model\block_instance_record;
 use block_completion_monitor\repository\completion_monitor_repository;
 
@@ -49,14 +50,14 @@ class completion_monitor_service
 
         $completions = self::get_progress($this->course, $activities, $userid, $submissions);
 
-        $completecount = count(array_filter($activities, function ($activity) use ($completions) {
-            return $completions[$activity['id']] == COMPLETION_COMPLETE || $completions[$activity['id']] == COMPLETION_COMPLETE_PASS;
+        $completecount = count(array_filter($activities, function (activity_details $activity) use ($completions) {
+            return $completions[$activity->get_id()] == COMPLETION_COMPLETE || $completions[$activity->get_id()] == COMPLETION_COMPLETE_PASS;
         }));
 
         $progressvalue = $completecount == 0 ? 0 : $completecount / count($activities);
 
         return [
-            'percentage' => (int)floor($progressvalue * 100),
+            'percentage' => (int) floor($progressvalue * 100),
             'completions' => $completions
         ];
     }
@@ -81,13 +82,12 @@ class completion_monitor_service
         $activities = $this->get_activities_details($this->course);
 
         if ($onlyrequired) {
-            $activities = array_filter($activities, fn($activity) => $activity["required"] == true);
+            $activities = array_filter($activities, fn(activity_details $activity) => $activity->get_required() == true);
         }
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
 
-        $canviewhiddenactivities  = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
-
-        foreach ($activities as $activity) {
-            $coursemodule = $modinfo->cms[$activity['id']];
+        foreach ($activities as /** @var activity_details */ $activity) {
+            $coursemodule = $modinfo->cms[$activity->get_id()];
 
             if (!$coursemodule->visible && !$canviewhiddenactivities) {
                 continue;
@@ -95,16 +95,16 @@ class completion_monitor_service
 
             if (!empty($CFG->enableavailability)) {
                 if ($canviewhiddenactivities) {
-                    $activity['available'] = true;
+                    $activity->set_available(true);
                 } else {
                     if (isset($coursemodule->available) && !$coursemodule->available && empty($coursemodule->availableinfo)) {
                         continue;
                     }
-                    $activity['available'] = $coursemodule->available;
+                    $activity->set_available($coursemodule->available);
                 }
             }
 
-            if (in_array($activity['type'] . '-' . $activity['instance'] . '-' . $userid, $exclusions)) {
+            if (in_array($activity->get_type() . '-' . $activity->get_instance() . '-' . $userid, $exclusions)) {
                 continue;
             }
 
@@ -160,21 +160,13 @@ class completion_monitor_service
                     }
                 }
 
-                $activities[] = [
-                    'type' => $module,
-                    'modulename' => $modulename,
-                    'id' => $cm->id,
-                    'instance' => $cm->instance,
-                    'name' => format_string($cm->name),
-                    'expected' => $cm->completionexpected,
-                    'section' => $cm->sectionnum,
-                    'position' => array_search($cm->id, $sections[$cm->sectionnum]),
-                    'url' => !is_null($cm->url) && method_exists($cm->url, 'out') ? $cm->url->out() : '',
-                    'context' => $cm->context,
-                    'icon' => $cm->get_icon_url(),
-                    'available' => $cm->available,
-                    'required' => $required
-                ];
+                $activitiesdetails = new activity_details($cm);
+                $activitiesdetails->set_type($module);
+                $activitiesdetails->set_modulename($modulename);
+                $activitiesdetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
+                $activitiesdetails->set_required($required);
+
+                $activities[] = $activitiesdetails;
             }
         }
 
@@ -195,7 +187,7 @@ class completion_monitor_service
         $exists = $this->accmrepository->block_instance_exists($context->id);
 
         if (!$exists) {
-            $blockRecord = new block_instance_record(                
+            $blockRecord = new block_instance_record(
                 blockname: 'completion_monitor',
                 parentcontextid: $context->id,
                 pagetypepattern: 'course-view-*'
@@ -214,7 +206,7 @@ class completion_monitor_service
 
         if ($exists) {
             $DB->delete_records('block_instances', [
-                'blockname'       => 'completion_monitor',
+                'blockname' => 'completion_monitor',
                 'parentcontextid' => $context->id
             ]);
         }

@@ -6,6 +6,10 @@ use block_completion_monitor\repository\completion_monitor_repository;
 
 defined('MOODLE_INTERNAL');
 
+global $CFG;
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
+
 class block_completion_monitor_helper_testcase extends advanced_testcase
 {
     use progress;
@@ -26,15 +30,8 @@ class block_completion_monitor_helper_testcase extends advanced_testcase
         $this->repository = new completion_monitor_repository();
     }
 
-    /**
-     * @covers self::get_progress
-     */
-    public function test_local_mentor_core_completion_get_progress()
+    public function test_completion_monitor_get_progress()
     {
-        global $CFG;
-
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
-
         $courserecord = new stdClass();
         $courserecord->enablecompletion = 1;
         $course = $this->getDataGenerator()->create_course($courserecord);
@@ -64,7 +61,7 @@ class block_completion_monitor_helper_testcase extends advanced_testcase
                 $instance2cm->id => 1,
             ]
         ];
-        $criterion = new completion_criteria_activity;
+        $criterion = new completion_criteria_activity();
         $criterion->update_config($criteriadata);
 
         $completion = new \completion_info($course);
