@@ -7,6 +7,8 @@ use block_completion_monitor\model\activity_details;
 use block_completion_monitor\model\block_instance_record;
 use block_completion_monitor\repository\completion_monitor_repository;
 
+require_once($CFG->libdir . '/completionlib.php');
+
 /**
  * Activities Completion Course Monitoring service.
  * 

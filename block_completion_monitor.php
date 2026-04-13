@@ -1,7 +1,5 @@
 <?php
 
-use block_completion_monitor\service\completion_monitor_service;
-
 defined('MOODLE_INTERNAL') || die();
 
 class block_completion_monitor extends block_base
@@ -22,7 +20,6 @@ class block_completion_monitor extends block_base
         return true;
     }
 
-
     /**
      * Allows the block to load any JS it requires into the page.
      */
@@ -30,12 +27,15 @@ class block_completion_monitor extends block_base
     {
         parent::get_required_javascript();
 
+        global $USER;
+
         $this->page->requires->strings_for_js([
             'showmore',
             'showless',
         ], 'block_completion_monitor');
 
         $this->page->requires->js_call_amd('block_completion_monitor/block_completion_monitor', 'init', ['courseid' => $this->page->course->id]);
+        $this->page->requires->js_call_amd('block_completion_monitor/completion_monitor_dynamic', 'init', ['userid' => $USER->id, 'courseid' => $this->page->course->id]);
     }
 
     public function get_content()
