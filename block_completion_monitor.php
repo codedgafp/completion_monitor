@@ -47,10 +47,14 @@ class block_completion_monitor extends block_base
 
     public function get_content()
     {
-        if ($this->content !== null) {
+        $this->content = new \stdClass();
+        $this->content->text = '';
+        // Check if the block should be displayed for the course.
+        $service = new completion_monitor_service($this->page->course);
+        if (!$service->should_display_block($this->page->course->id)) {
             return $this->content;
         }
-
+        
         $renderer = $this->page->get_renderer('block_completion_monitor');
 
         $this->content = new \stdClass();

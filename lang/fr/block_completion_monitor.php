@@ -24,3 +24,7 @@ $string['showless'] = 'Réduire';
 
 $string['courseprogress_percentage'] = 'Cours complété à {$a}%';
 $string['courseprogress_step'] = '{$a->activitiescompleted} sur {$a->activitiestocompleted} activités requises terminées';
+
+$string['region-topb-lock'] = 'Zone supérieure du cours';
+$string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités du cours';
+

@@ -44,7 +44,10 @@ class completion_monitor_service
 
         $activities = $this->get_filtered_activities($userid, $exclusions, true);
         if (empty($activities)) {
-            return ['percentage' => 0];
+            return [
+                'percentage' => 0,
+                'completions' => []
+            ];
         }
 
         // Finds submissions for a user in a course.
@@ -88,11 +91,9 @@ class completion_monitor_service
         }
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
 
-        foreach (
-            $activities as
-            /** @var activity_details */
-            $activity
-        ) {
+        foreach ($activities as
+        /** @var activity_details */
+        $activity) {
             $coursemodule = $modinfo->cms[$activity->get_id()];
 
             if (!$coursemodule->visible && !$canviewhiddenactivities) {
@@ -125,7 +126,7 @@ class completion_monitor_service
      *
      * @param \stdClass $course
      * @return activity_details[] $activities
-     */
+     **/
     public function get_activities_details(\stdClass $course): array
     {
         global $USER, $DB;
@@ -257,5 +258,14 @@ class completion_monitor_service
         if (!empty($scorm) && $scorm->popup == 0) {
             $activitiesdetails->set_opennewtab($scorm->popup == 1);
         }
+    }
+
+    public function should_display_block(int $courseId): bool
+    {
+        global $USER;
+        $exclusions = $this->accmrepository->get_grade_exclusions($courseId, $USER->id);
+
+        $activities = $this->get_filtered_activities($USER->id, $exclusions);
+        return !empty($activities);
     }
 }

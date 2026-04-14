@@ -360,4 +360,39 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $position = $CFG->blocktopregion ?? BLOCK_POS_LEFT;
         self::assertEquals($position, $DB->get_field('block_instances', 'defaultregion', ['parentcontextid' => $context->id]));
     }
+
+    public function test_should_display_block()
+    {
+        global $USER;
+
+        self::setAdminUser();
+
+
+        $shoulddisplay = $this->service->should_display_block($this->course->id);
+        self::assertFalse($shoulddisplay);
+
+        $record = new stdClass();
+        $record->course = $this->course;
+        $record->completion = 1;
+        $record->completionview = 1;
+        $record->completionexpected = 0;
+        $record->completionunlocked = 1;
+        $record->visible = 1;
+        $instance1 = $this->getDataGenerator()->create_module('url', $record);
+        $instance1cm = get_coursemodule_from_id('url', $instance1->cmid);
+
+        // create course completion, and add the url activity as criteria
+        $criteriadata = (object) [
+            'id' => $this->course->id,
+            'criteria_activity' => [
+                $instance1cm->id => 1
+            ]
+        ];
+        $criterion = new completion_criteria_activity();
+        $criterion->update_config($criteriadata);
+
+        $shoulddisplay = $this->service->should_display_block($this->course->id);
+        self::assertTrue($shoulddisplay);
+    }
+
 }
