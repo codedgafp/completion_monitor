@@ -145,3 +145,51 @@
 
     }
 }
+
+// Side view
+#block-region-side-pre section.block_completion_monitor {
+    margin: 0;
+
+    section.block_completion_monitor {
+        margin: 10px 0 0 0;
+        border: 0 !important;
+        box-shadow: none;
+
+        .card-body {
+            padding: 0 !important;
+
+            .completion_monitor-custom-header {
+                .main-content {
+                    justify-content: end;
+                    max-width: 235px;
+
+                    h2 {
+                        display: none;
+                    }
+                    .course-progress-percentage {
+                        font-size: 15px;
+                    }
+                    .course-progress-step {
+                        font-size: 12px;
+                    }
+                    .completion-monitor-progress-details {
+                        display: block !important;
+                        margin-left: 10px !important;
+                    }
+                }
+
+                .open-block {
+                    button {
+                        font-size: 12px;
+                    }
+                }
+            }
+
+            .completion_monitor-content {
+                .completion-monitor-progress-details {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}
