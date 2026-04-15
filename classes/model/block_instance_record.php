@@ -30,16 +30,16 @@ class block_instance_record
         string $blockname,
         int $parentcontextid,
         string $pagetypepattern,
-        string $defaultregion = BLOCK_POS_TOP,
         int $defaultweight = 1
     ) {
+        global $CFG;
 
         $this->blockname = $blockname;
         $this->parentcontextid = $parentcontextid;
         $this->showinsubcontexts = 0;
         $this->pagetypepattern = $pagetypepattern;
         $this->subpagepattern = null;
-        $this->defaultregion = $defaultregion;
+        $this->defaultregion = ($CFG->blocktopregion) ?? BLOCK_POS_LEFT;
         $this->defaultweight = $defaultweight;
         $this->timecreated = time();
         $this->timemodified = time();

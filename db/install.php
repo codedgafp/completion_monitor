@@ -1,15 +1,15 @@
 <?php
-defined('MOODLE_INTERNAL') || die();
 
+defined('MOODLE_INTERNAL') || die();
+use block_completion_monitor\service\add_block_service;
 function xmldb_block_completion_monitor_install()
 {
-    $courses = get_courses();
+    if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+        mtrace('completion_monitor: installation – ajout des blocks');
 
-    foreach ($courses as $course) {
-        if ($course->id == SITEID) continue;
-            $service = new \block_completion_monitor\service\completion_monitor_service($course);
-            $service->add_block_to_course();       
+        $service = new add_block_service();
+        $service->sync_block();
+
+        mtrace('completion_monitor: installation terminée');
     }
-
-    return true;
 }

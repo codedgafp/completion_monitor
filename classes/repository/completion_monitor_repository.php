@@ -310,4 +310,45 @@ class completion_monitor_repository
                                 cm.id = :cmid
                             ', ['cmid' => $cmid]);
     }
+    public function get_sessions_trainings_without_block(): iterable
+    {
+        $sql = "
+            SELECT c.*
+            FROM {course} c
+            JOIN {context} ctx
+            ON ctx.instanceid = c.id
+            AND ctx.contextlevel = :courselevel
+            WHERE c.id <> :siteid
+            AND NOT EXISTS (
+                    SELECT 1
+                    FROM {block_instances} bi
+                    WHERE bi.parentcontextid = ctx.id
+                    AND bi.blockname = :blockname
+            )
+            AND (
+                    EXISTS (
+                        SELECT 1
+                        FROM {session} s
+                        WHERE s.courseshortname = c.shortname
+                    )
+            OR EXISTS (
+                        SELECT 1
+                        FROM {training} t
+                        WHERE t.courseshortname = c.shortname
+                    )
+            )
+        ";
+
+        $rs = $this->db->get_recordset_sql($sql, [
+            'courselevel' => CONTEXT_COURSE,
+            'blockname'   => 'completion_monitor',
+            'siteid'      => SITEID,
+        ]);
+
+        foreach ($rs as $record) {
+            yield $record;
+        }
+
+        $rs->close();
+    }
 }

@@ -258,7 +258,6 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertTrue($exists);
-        
     }
 
     public function test_remove_block_from_course()
@@ -344,4 +343,21 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         self::assertTrue($activitydetails->get_opennewtab());
     }
 
+    public function test_add_block_to_course_check_position()
+    {
+        global $DB, $CFG;
+
+        $context = \context_course::instance($this->course->id);
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertFalse($exists);
+
+        $this->service->add_block_to_course();
+
+        $exists = $this->repository->block_instance_exists($context->id);
+        self::assertTrue($exists);
+
+        $position = $CFG->blocktopregion ?? BLOCK_POS_LEFT;
+        self::assertEquals($position, $DB->get_field('block_instances', 'defaultregion', ['parentcontextid' => $context->id]));
+    }
 }

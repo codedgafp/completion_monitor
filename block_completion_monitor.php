@@ -20,6 +20,13 @@ class block_completion_monitor extends block_base
         return true;
     }
 
+
+    public function hide_header()
+    {
+        return true;
+    }
+
+
     /**
      * Allows the block to load any JS it requires into the page.
      */

@@ -7,10 +7,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**#@+
- * Default name for the block top region.
- */
-define('BLOCK_POS_TOP',  'top-block');
+
 
 function block_completion_monitor_user_preferences()
 {

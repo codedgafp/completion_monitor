@@ -1,4 +1,5 @@
 <?php
+
 namespace block_completion_monitor\output;
 
 use block_completion_monitor\model\template_context;
@@ -47,7 +48,7 @@ class renderer extends plugin_renderer_base
      */
     public function render_block_with_controls(\block_base $accm_block): string
     {
-        global $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT, $CFG;
 
         $contenttext = $this->render_block();
 
@@ -68,6 +69,6 @@ class renderer extends plugin_renderer_base
             );
         }
 
-        return $OUTPUT->block($bc, BLOCK_POS_TOP);
+        return $OUTPUT->block($bc, $CFG->blocktopregion ?? BLOCK_POS_LEFT);
     }
 }
