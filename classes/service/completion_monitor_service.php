@@ -70,7 +70,7 @@ class completion_monitor_service
      * @param int $userid
      * @param array $exclusions
      * @param bool $onlyrequired
-     * @return array
+     * @return activity_details[]
      */
     public function get_filtered_activities(int $userid, array $exclusions, bool $onlyrequired = false): array
     {
@@ -88,7 +88,11 @@ class completion_monitor_service
         }
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
 
-        foreach ($activities as /** @var activity_details */ $activity) {
+        foreach (
+            $activities as
+            /** @var activity_details */
+            $activity
+        ) {
             $coursemodule = $modinfo->cms[$activity->get_id()];
 
             if (!$coursemodule->visible && !$canviewhiddenactivities) {
@@ -120,7 +124,7 @@ class completion_monitor_service
      * Return details about the course activities.
      *
      * @param \stdClass $course
-     * @return array $activities
+     * @return activity_details[] $activities
      */
     public function get_activities_details(\stdClass $course): array
     {
@@ -146,40 +150,38 @@ class completion_monitor_service
                     continue;
                 }
 
-                $required = false;
+                $required = $this->is_activity_required($coursecompletioncriterialist, $cm->id, $module, $coursecompletionactivities);
 
-                if ($coursecompletioncriterialist) {
-                    $cmid = $cm->id;
+                $activitydetails = new activity_details($cm);
+                $activitydetails->set_type($module);
+                $activitydetails->set_modulename($modulename);
+                $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
+                $activitydetails->set_required($required);
 
-                    $coursecompletioncriteria = array_filter(
-                        $coursecompletioncriterialist,
-                        fn($criteria) => $criteria->module == $module && $criteria->moduleinstance == $cmid
-                    );
-                    $coursecompletioncriteriaid = current(array_map(fn($criteria) => $criteria->id, $coursecompletioncriteria));
-
-                    if (array_filter($coursecompletionactivities, fn($criteria) => $criteria->id == $coursecompletioncriteriaid)) {
-                        $required = true;
-                    }
+                //Due to the Patch Edunao mentor: display scorm in a new tab or not.
+                if ($cm->name === 'scorm') {
+                    $this->set_opennewtab_for_scorm($activitydetails, $cm);
                 }
 
-                $activitiesdetails = new activity_details($cm);
-                $activitiesdetails->set_type($module);
-                $activitiesdetails->set_modulename($modulename);
-                $activitiesdetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
-                $activitiesdetails->set_required($required);
-
-                $activities[] = $activitiesdetails;
+                $activities[] = $activitydetails;
             }
         }
 
         return $activities;
     }
 
-    public function activities_has_completion(int $courseId): bool
+    /**
+     * @param int $courseid
+     * @return bool
+     */
+    public function activities_has_completion(int $courseid): bool
     {
-        return $this->accmrepository->activity_has_completion($courseId);
+        return $this->accmrepository->activity_has_completion($courseid);
     }
 
+    /**
+     * @return void
+     */
     public function add_block_to_course(): void
     {
         global $DB;
@@ -199,6 +201,9 @@ class completion_monitor_service
         }
     }
 
+    /**
+     * @return void
+     */
     public function remove_block_from_course(): void
     {
         global $DB;
@@ -211,6 +216,46 @@ class completion_monitor_service
                 'blockname' => 'completion_monitor',
                 'parentcontextid' => $context->id
             ]);
+        }
+    }
+
+    /**
+     * Check whether an activity is required based on the list of items to be validated for the training,
+     * according to the “COMPLETION_CRITERIA_TYPE_ACTIVITY” criterion
+     * 
+     * @param array $coursecompletioncriterialist
+     * @param int $cmid
+     * @param string $module
+     * @param array $coursecompletionactivities
+     * @return bool
+     */
+    private function is_activity_required(array $coursecompletioncriterialist, int $cmid, string $module, array $coursecompletionactivities): bool
+    {
+        if ($coursecompletioncriterialist) {
+            $coursecompletioncriteria = array_filter(
+                $coursecompletioncriterialist,
+                fn($criteria) => $criteria->module == $module && $criteria->moduleinstance == $cmid
+            );
+            $coursecompletioncriteriaid = current(array_map(fn($criteria) => $criteria->id, $coursecompletioncriteria));
+
+            return !empty(array_filter($coursecompletionactivities, fn($criteria) => $criteria->id == $coursecompletioncriteriaid));
+        }
+
+        return false;
+    }
+
+    /**
+     * If the scorm activity allow popup, then update the activity_details given object
+     * 
+     * @param activity_details $activitiesdetails
+     * @param \cm_info $coursemodule
+     * @return void
+     */
+    private function set_opennewtab_for_scorm(activity_details $activitiesdetails, \cm_info $coursemodule): void
+    {
+        $scorm = $this->accmrepository->get_scorm_by_coursemoduleid($coursemodule->id);
+        if (!empty($scorm) && $scorm->popup == 0) {
+            $activitiesdetails->set_opennewtab($scorm->popup == 1);
         }
     }
 }

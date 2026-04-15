@@ -246,7 +246,8 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
     public function test_add_block_to_course()
     {
-        global $DB;
+        $this->setAdminUser();
+
 
         $context = \context_course::instance($this->course->id);
 
@@ -262,6 +263,8 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
     public function test_remove_block_from_course()
     {
+        $this->setAdminUser();
+
         $context = \context_course::instance($this->course->id);
 
         $this->service->add_block_to_course();
@@ -273,6 +276,72 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertFalse($exists);
+    }
+
+    public function test_get_activities_details_completion_conditions_ok()
+    {
+        $this->setAdminUser();
+
+        $record = new stdClass();
+        $record->course = $this->course;
+        $record->completion = 1;
+        $record->completionview = 1;
+        $record->completionexpected = 0;
+        $record->completionunlocked = 1;
+        $record->visible = 1;
+        $instance = $this->getDataGenerator()->create_module('quiz', $record);
+        $instancecm = get_coursemodule_from_id('quiz', $instance->cmid);
+
+        $criteriadata = (object) [
+            'id' => $this->course->id,
+            'criteria_activity' => [
+            $instancecm->id => 1
+            ]
+        ];
+        $criterion = new completion_criteria_activity();
+        $criterion->update_config($criteriadata);   
+
+        $activitiesdetails = $this->service->get_activities_details($this->course);
+        $activitydetails = current($activitiesdetails);
+        self::assertNotNull($activitydetails);
+        $completionconditions = json_decode($activitydetails->get_completionconditions(), true);
+        self::assertEquals([[
+            'status' => 0,
+            'description' => 'Mark complete'
+        ]], $completionconditions);
+        self::assertInstanceOf(activity_details::class, $activitydetails);
+        self::assertEquals($instancecm->id, $activitydetails->get_id());
+        self::assertEquals('quiz', $activitydetails->get_type());
+    }
+
+    public function test_get_activities_details_scorm_opennewtab_ok()
+    {
+        $this->setAdminUser();
+
+        $record = new stdClass();
+        $record->course = $this->course;
+        $record->completion = 1;
+        $record->completionview = 1;
+        $record->completionexpected = 0;
+        $record->completionunlocked = 1;
+        $record->visible = 1;
+        $record->popup = 1;
+        $instance = $this->getDataGenerator()->create_module('scorm', $record);
+        $instancecm = get_coursemodule_from_id('scorm', $instance->cmid);
+
+        $criteriadata = (object) [
+            'id' => $this->course->id,
+            'criteria_activity' => [
+            $instancecm->id => 1
+            ]
+        ];
+        $criterion = new completion_criteria_activity();
+        $criterion->update_config($criteriadata);   
+
+        $activitiesdetails = $this->service->get_activities_details($this->course);
+        $activitydetails = current($activitiesdetails);
+        self::assertNotNull($activitydetails);
+        self::assertTrue($activitydetails->get_opennewtab());
     }
 
 }

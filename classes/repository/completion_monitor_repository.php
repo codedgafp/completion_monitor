@@ -300,4 +300,14 @@ class completion_monitor_repository
         ]);
     }
 
+    public function get_scorm_by_coursemoduleid(int $cmid): ?object
+    {
+        return $this->db->get_record_sql('
+                                SELECT s.*
+                                FROM {scorm} s
+                                JOIN {course_modules} cm ON cm.instance = s.id
+                                WHERE
+                                cm.id = :cmid
+                            ', ['cmid' => $cmid]);
+    }
 }

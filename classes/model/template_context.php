@@ -16,9 +16,14 @@ class template_context extends model_manager
 
     private ?string $courseprogress_step = null;
 
+    private ?array $activitiesdetails = null;
+
     public function __construct(\stdClass $course)
     {
-        $this->display_percentage = $this->display_percentage($course);
+        $service = new completion_monitor_service($course);
+        $activities = $service->get_activities_details($course);
+
+        $this->display_percentage = $this->display_percentage($activities);
 
         if ($this->display_percentage) {
             $coursecompletiondetails = $this->course_completion_details($course);
@@ -26,6 +31,7 @@ class template_context extends model_manager
             $this->percentage_circle_data = new percentage_circle($course);
             $this->courseprogress_percentage = get_string('courseprogress_percentage', 'block_completion_monitor', $coursecompletiondetails['percentage']);
             $this->courseprogress_step = get_string('courseprogress_step', 'block_completion_monitor', $this->course_progress_step_details($coursecompletiondetails['completions']));
+            $this->activitiesdetails = $service->get_activities_details($course);
         }
     }
 
@@ -35,19 +41,28 @@ class template_context extends model_manager
             'display_percentage' => $this->display_percentage,
             'percentage_circle_data' => $this->percentage_circle_data,
             'courseprogress_percentage' => $this->courseprogress_percentage,
-            'courseprogress_step' => $this->courseprogress_step
+            'courseprogress_step' => $this->courseprogress_step,
+            'activitiesdetails' => $this->activitiesdetails,
         ];
     }
 
-    private function display_percentage(\stdClass $course): bool
+    /**
+     * If an activity in required, then display percentage
+     * 
+     * @param activity_details[] $activities
+     * @return bool
+     */
+    private function display_percentage(array $activities): bool
     {
-        $service = new completion_monitor_service($course);
-        $activities = $service->get_activities_details($course);
         $requiredactivities = array_filter($activities, fn(activity_details $activity) => $activity->get_required() == true);
 
         return count($requiredactivities) > 0;
     }
 
+    /**
+     * @param array $completions
+     * @return object
+     */
     private function course_progress_step_details(array $completions): \stdClass
     {
         $completionscompleted = array_filter($completions, fn($completion) => $completion == COMPLETION_COMPLETE);
