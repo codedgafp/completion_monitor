@@ -2,6 +2,7 @@
 
 namespace block_completion_monitor\service;
 
+use moodle_database;
 use block_completion_monitor\helper\progress;
 use block_completion_monitor\model\activity_details;
 use block_completion_monitor\model\block_instance_record;
@@ -25,10 +26,19 @@ class completion_monitor_service
      */
     protected completion_monitor_repository $accmrepository;
 
+    /**
+     * Moodle Database
+     * @var moodle_database
+     */
+    protected moodle_database $db;
+
     public function __construct(
         private \stdClass $course,
     ) {
+        global $DB;
+
         $this->accmrepository = new completion_monitor_repository();
+        $this->db = $DB;
     }
 
     /**
@@ -53,7 +63,7 @@ class completion_monitor_service
         // Finds submissions for a user in a course.
         $submissions = $this->accmrepository->get_user_course_submissions($this->course->id, $userid);
 
-        $completions = self::get_progress($this->course, $activities, $userid, $submissions);
+        $completions = self::get_progress_from_course_modules($this->course, $activities, $userid, $submissions);
 
         $completecount = count(array_filter($activities, function (activity_details $activity) use ($completions) {
             return $completions[$activity->get_id()] == COMPLETION_COMPLETE || $completions[$activity->get_id()] == COMPLETION_COMPLETE_PASS;
@@ -96,7 +106,7 @@ class completion_monitor_service
         $activity) {
             $coursemodule = $modinfo->cms[$activity->get_id()];
 
-            if (!$coursemodule->visible && !$canviewhiddenactivities) {
+            if (!$coursemodule->visible && !$canviewhiddenactivities && !$coursemodule->is_visible_on_course_page()) {
                 continue;
             }
 
@@ -129,7 +139,7 @@ class completion_monitor_service
      **/
     public function get_activities_details(\stdClass $course): array
     {
-        global $USER, $DB;
+        global $USER;
 
         $coursecompletion = new \completion_info($course);
         $coursecompletionactivities = $coursecompletion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
@@ -140,14 +150,14 @@ class completion_monitor_service
         $coursemodules = $modinfo->instances;
         $activities = [];
 
-        $coursecompletioncriterialist = $DB->get_records('course_completion_criteria', ['course' => $course->id]);
+        $coursecompletioncriterialist = $this->db->get_records('course_completion_criteria', ['course' => $course->id]);
 
         // Create activities list with completion set.
         foreach ($coursemodules as $module => $instances) {
             $modulename = get_string('pluginname', $module);
 
             foreach ($instances as $cm) {
-                if ($cm->completion === COMPLETION_TRACKING_NONE) {
+                if ($cm->completion === COMPLETION_TRACKING_NONE || !$cm->is_visible_on_course_page()) {
                     continue;
                 }
 
@@ -185,8 +195,6 @@ class completion_monitor_service
      */
     public function add_block_to_course(): void
     {
-        global $DB;
-
         $context = \context_course::instance($this->course->id);
 
         $exists = $this->accmrepository->block_instance_exists($context->id);
@@ -198,7 +206,7 @@ class completion_monitor_service
                 pagetypepattern: 'course-view-*'
             );
 
-            $DB->insert_record('block_instances', $blockRecord->buildRecord());
+            $this->db->insert_record('block_instances', $blockRecord->buildRecord());
         }
     }
 
@@ -207,13 +215,11 @@ class completion_monitor_service
      */
     public function remove_block_from_course(): void
     {
-        global $DB;
-
         $context = \context_course::instance($this->course->id);
         $exists = $this->accmrepository->block_instance_exists($context->id);
 
         if ($exists) {
-            $DB->delete_records('block_instances', [
+            $this->db->delete_records('block_instances', [
                 'blockname' => 'completion_monitor',
                 'parentcontextid' => $context->id
             ]);
@@ -267,5 +273,26 @@ class completion_monitor_service
 
         $activities = $this->get_filtered_activities($USER->id, $exclusions);
         return !empty($activities);
+    }
+
+    /**
+     * @param int $userid
+     * @param int $cmid
+     * @return string
+     */
+    public function course_module_viewed_preference_name(int $userid, int $cmid): string
+    {
+        return "course_module_viewed_" . $userid . "_" . $cmid;
+    }
+
+    /**
+     * @param int $userid
+     * @param int $cmid
+     * @return bool
+     */
+    public function course_module_has_beed_viewed(int $userid, int $cmid): bool
+    {
+        $preferencename = $this->course_module_viewed_preference_name($userid, $cmid);
+        return $this->db->record_exists('user_preferences', ['name' => $preferencename]);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use block_completion_monitor\service\completion_monitor_service;
+
 defined('MOODLE_INTERNAL') || die();
 
 class block_completion_monitor extends block_base

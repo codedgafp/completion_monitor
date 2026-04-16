@@ -2,8 +2,6 @@
 
 namespace block_completion_monitor\helper;
 
-use block_completion_monitor\model\activity_details;
-
 defined('MOODLE_INTERNAL') || die();
 
 trait progress
@@ -16,7 +14,7 @@ trait progress
      * @param array $submissions
      * @return array
      */
-    protected function get_progress(\stdClass $course, array $activities, int $userid, array $submissions): array
+    protected function get_progress_from_course_modules(\stdClass $course, array $activities, int $userid, array $submissions): array
     {
         $completions = [];
 
@@ -28,15 +26,20 @@ trait progress
             $completion = $completioninfo->get_data($cm, true, $userid);
             $submission = $submissions["$userid-$cm->id"] ?? null;
 
-            if ($completion->completionstate == COMPLETION_INCOMPLETE && $submission) {
-                $completions[$cm->id] = 'submitted';
-            } else if ($completion->completionstate == COMPLETION_COMPLETE_FAIL && $submission && !$submission->graded) {
-                $completions[$cm->id] = 'submitted';
-            } else {
-                $completions[$cm->id] = $completion->completionstate;
-            }
+            $completions[$cm->id] = $this->get_completion_state($completion, $submission);
         }
 
         return $completions;
+    }
+
+    protected function get_completion_state(\stdClass $completion, \stdClass $submission = null)
+    {
+        if ($completion->completionstate == COMPLETION_INCOMPLETE && $submission) {
+            return ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+        } else if ($completion->completionstate == COMPLETION_COMPLETE_FAIL && $submission && !$submission->graded) {
+            return ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+        } else {
+            return $completion->completionstate;
+        }
     }
 }

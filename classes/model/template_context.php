@@ -42,7 +42,7 @@ class template_context extends model_manager
             'percentage_circle_data' => $this->percentage_circle_data,
             'courseprogress_percentage' => $this->courseprogress_percentage,
             'courseprogress_step' => $this->courseprogress_step,
-            'activitiesdetails' => $this->activitiesdetails,
+            'activities_details' => $this->activitiesdetails,
         ];
     }
 

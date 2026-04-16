@@ -2,12 +2,25 @@
 
 namespace block_completion_monitor\model;
 
+use block_completion_monitor\helper\progress;
+use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\repository\completion_monitor_repository;
 use core_completion\cm_completion_details;
 
 defined('MOODLE_INTERNAL') || die();
 
 class activity_details
 {
+    use progress;
+
+    private const string COMPLETED = 'completed';
+
+    private const string INPROGRESS = 'in_progress';
+
+    private const string NOTSTARTED = 'not_started';
+
+    private const string LOCKED = 'locked';
+
     private ?string $type = null;
 
     private ?string $modulename = null;
@@ -36,6 +49,8 @@ class activity_details
 
     private ?string $completionconditions = null;
 
+    private ?string $status = null;
+
     private bool $opennewtab = true;
 
     public function __construct(\cm_info $cm, \completion_info $completioninfo = null)
@@ -55,6 +70,7 @@ class activity_details
         $this->icon = $cm->get_icon_url();
         $this->available = $cm->available;
         $this->completionconditions = json_encode($this->get_activity_completion_conditions($cm, $completioninfo));
+        $this->status = $this->get_completion_state_by_activity_id($course, $cm);
     }
 
     public function get_type(): ?string
@@ -144,5 +160,67 @@ class activity_details
         }
 
         return $conditions;
+    }
+
+    /**
+     * Return the completion status of a course module
+     * 
+     * @param \stdClass $course
+     * @param \cm_info $cm
+     * @return string
+     */
+    private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm): string
+    {
+        global $USER, $DB;
+
+        $service = new completion_monitor_service($course);
+
+        $userid = $USER->id;
+        $completioninfo = new \completion_info($course);
+        $completion = $completioninfo->get_data($cm, true, $userid);
+
+        if (!$cm->uservisible) {
+            return self::LOCKED;
+        }
+
+        if ($service->course_module_has_beed_viewed($userid, $cm->id)) {
+            $repository = new completion_monitor_repository();
+            // Finds submissions for a user in a course.
+            $submissions = $repository->get_user_course_submissions($course->id, $userid);
+            $submission = $submissions["$userid-$cm->id"] ?? null;
+
+            $completionstate = $this->get_completion_state($completion, $submission);
+
+            return $this->completion_state_map($completionstate);
+        }
+
+        return self::NOTSTARTED;
+    }
+
+    /**
+     * Map Moodle's completion statuses to those of the completion_monitor block
+     * 
+     * @param int $state
+     * @return string
+     */
+    private function completion_state_map(int $state): string
+    {
+        switch ($state) {
+            case COMPLETION_INCOMPLETE:
+            case COMPLETION_COMPLETE_FAIL:
+                $completionstate = self::INPROGRESS;
+                break;
+
+            case COMPLETION_COMPLETE:
+            case COMPLETION_COMPLETE_PASS:
+                $completionstate = self::COMPLETED;
+                break;
+
+            default:
+                $completionstate = self::NOTSTARTED;
+                break;
+        }
+
+        return $completionstate;
     }
 }

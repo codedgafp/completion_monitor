@@ -102,6 +102,8 @@ class completion_monitor_repository
             $params['userid'] = $userid;
         }
 
+        $submittedconstant = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+
         $sqlconcat = $this->db->sql_concat('s.userid', "'-'", 'c.id');
         $sql = "SELECT $sqlconcat AS id, s.userid,
                     c.id AS cmid,
@@ -114,7 +116,7 @@ class completion_monitor_repository
                     AND ag.attemptnumber = s.attemptnumber
                     AND ag.userid = s.userid
                 WHERE s.latest = 1
-                    AND s.status = 'submitted'
+                    AND s.status = '$submittedconstant'
                     AND a.course = :courseid
                     AND (
                         a.teamsubmission = 0 OR
@@ -143,6 +145,8 @@ class completion_monitor_repository
             $params['userid'] = $userid;
         }
 
+        $submittedconstant = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+
         $sqlconcat = $this->db->sql_concat('s.userid', "'-'", 'c.id');
         $sql = "SELECT $sqlconcat AS id,
                     s.userid, c.id AS cmid,
@@ -156,7 +160,7 @@ class completion_monitor_repository
                     AND ag.attemptnumber = gs.attemptnumber
                     AND ag.userid = s.userid
                 WHERE gs.latest = 1
-                    AND gs.status = 'submitted'
+                    AND gs.status = '$submittedconstant'
                     AND gs.userid = 0
                     AND a.course = :courseid
                     AND (a.teamsubmission <> 0 AND a.requireallteammemberssubmit = 0)

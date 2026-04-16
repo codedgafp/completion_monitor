@@ -42,4 +42,24 @@ class observer
         ]);
     }
 
+    public static function set_course_module_status_in_progress(\core\event\course_module_viewed $event): void
+    {
+        global $USER;
+
+        $data = $event->get_data();
+        $userid = $USER->id;
+        $cmid = $data["contextinstanceid"];
+
+        $course = get_course($data['courseid']);
+        $service = new completion_monitor_service($course);
+
+        $userpreferencename = $service->course_module_viewed_preference_name($userid, $cmid);
+        $userpreferencedata = json_encode([
+            "time_access" => time(),
+            "user_id" => $userid,
+            "course_module_id" => $cmid
+        ]);
+
+        set_user_preference($userpreferencename, $userpreferencedata);
+    }
 }

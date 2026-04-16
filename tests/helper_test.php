@@ -72,7 +72,7 @@ class block_completion_monitor_helper_testcase extends advanced_testcase
         $exclusions = $this->repository->get_grade_exclusions($course->id, $student->id);
         $activities = $service->get_filtered_activities($student->id, $exclusions);
         $submissions = $this->repository->get_user_course_submissions($course->id, $student->id);
-        $completions = self::get_progress($course, $activities, $student->id, $submissions);
+        $completions = self::get_progress_from_course_modules($course, $activities, $student->id, $submissions);
 
         self::assertCount(2, $completions);
         self::assertArrayHasKey($instance1->cmid, $completions);
