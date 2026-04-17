@@ -63,8 +63,8 @@ define([], function () {
             const completion_details = parsedata.completion_details;
 
             const circleprogress = document.querySelector(`#completion-monitor-circle-progress`);
-            const courseprogresspercentage = document.querySelector(`.completion_monitor-custom-header .course-progress-percentage`);
-            const courseprogressstep = document.querySelector(`.completion_monitor-custom-header .course-progress-step`);
+            const courseprogresspercentagelist = document.querySelectorAll(`.block-completion-monitor .course-progress-percentage`);
+            const courseprogresssteplist = document.querySelectorAll(`.block-completion-monitor .course-progress-step`);
 
             // Circle progress
             circleprogress.querySelector('span').textContent = `${completion_percentage}%`;
@@ -72,8 +72,12 @@ define([], function () {
             circleprogress.querySelector('#circle-front').setAttribute("stroke-dashoffset", completion_details.percentage_circle_data.offset)
 
             // Completion information
-            courseprogresspercentage.textContent = completion_details.courseprogress_percentage;
-            courseprogressstep.textContent = completion_details.courseprogress_step;
+            courseprogresspercentagelist.forEach(function (courseprogresspercentage) {
+                courseprogresspercentage.textContent = completion_details.courseprogress_percentage;
+            });
+            courseprogresssteplist.forEach(function (courseprogressstep) {
+                courseprogressstep.textContent = completion_details.courseprogress_step;
+            });
         },
     };
 
