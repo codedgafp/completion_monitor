@@ -13,13 +13,13 @@ class activity_details
 {
     use progress;
 
-    private const string COMPLETED = 'completed';
+    private const COMPLETED = 'completed';
 
-    private const string INPROGRESS = 'in_progress';
+    private const INPROGRESS = 'in_progress';
 
-    private const string NOTSTARTED = 'not_started';
+    private const NOTSTARTED = 'not_started';
 
-    private const string LOCKED = 'locked';
+    private const LOCKED = 'locked';
 
     private ?string $type = null;
 
