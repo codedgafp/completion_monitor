@@ -25,6 +25,6 @@ $string['showless'] = 'Show less';
 $string['courseprogress_percentage'] = 'Course {$a}% complete';
 $string['courseprogress_step'] = '{$a->activitiescompleted} out of {$a->activitiestocompleted} required tasks completed';
 
-$string['region-topb-lock'] = 'Top region of the course';
+$string['region-top-block'] = 'Top region of the course';
 $string['completion_monitor:addinstance'] = 'Allow adding the Activities Completion Course Monitoring block';
 
