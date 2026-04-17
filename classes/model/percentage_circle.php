@@ -6,13 +6,13 @@ defined('MOODLE_INTERNAL') || die();
 
 class percentage_circle extends model_manager
 {
-    public int $percentage;
+    private int $percentage;
 
-    public int $radius;
+    private int $radius;
 
-    public float $circumference;
+    private float $circumference;
 
-    public float $offset;
+    private float $offset;
 
     public function __construct($course)
     {
@@ -20,5 +20,15 @@ class percentage_circle extends model_manager
         $this->radius = 40;
         $this->circumference = (2 * M_PI * $this->radius);
         $this->offset = $this->circumference * (1 - $this->percentage / 100);
+    }
+
+    public function buildrecord(): array
+    {
+        return [
+            "percentage"    => $this->percentage,
+            "radius"        => $this->radius,
+            "circumference" => $this->circumference,
+            "offset"        => $this->offset,
+        ];
     }
 }

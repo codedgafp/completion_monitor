@@ -43,7 +43,6 @@ while ((time() - $start) < $maxDuration) {
     if ($percentage !== false) {
         flush_completion_percentage_event_data($course, $percentage);
         $flush = true;
-        break;
     }
 
     if ($flush) {
@@ -56,6 +55,7 @@ while ((time() - $start) < $maxDuration) {
         flush();
 
         $flush = false;
+        break;
     }
 
     sleep(1);

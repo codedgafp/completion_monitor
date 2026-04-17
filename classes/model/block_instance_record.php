@@ -15,15 +15,23 @@ require_once($CFG->dirroot . '/blocks/completion_monitor/lib.php');
 class block_instance_record
 {
 
-    public string $blockname;
-    public int $parentcontextid;
-    public int $showinsubcontexts;
-    public string $pagetypepattern;
-    public ?string $subpagepattern;
-    public string $defaultregion;
-    public int $defaultweight;
-    public int $timecreated;
-    public int $timemodified;
+    private string $blockname;
+
+    private int $parentcontextid;
+
+    private int $showinsubcontexts;
+
+    private string $pagetypepattern;
+
+    private ?string $subpagepattern;
+
+    private string $defaultregion;
+
+    private int $defaultweight;
+
+    private int $timecreated;
+
+    private int $timemodified;
 
 
     public function __construct(
@@ -45,7 +53,7 @@ class block_instance_record
         $this->timemodified = time();
     }
 
-    public function buildRecord(): \stdClass
+    public function buildrecord(): \stdClass
     {
         return (object) [
             'blockname'         => $this->blockname,

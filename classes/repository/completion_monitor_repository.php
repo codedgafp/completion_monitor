@@ -2,6 +2,8 @@
 
 namespace block_completion_monitor\repository;
 
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
 
 /**
  * Activities Completion Course Monitoring repository.

@@ -206,7 +206,7 @@ class completion_monitor_service
                 pagetypepattern: 'course-view-*'
             );
 
-            $this->db->insert_record('block_instances', $blockRecord->buildRecord());
+            $this->db->insert_record('block_instances', $blockRecord->buildrecord());
         }
     }
 

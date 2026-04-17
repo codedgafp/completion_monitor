@@ -73,6 +73,28 @@ class activity_details
         $this->status = $this->get_completion_state_by_activity_id($course, $cm);
     }
 
+    public function buildrecord(): array
+    {
+        return [
+            "id"                    => $this->id,
+            "type"                  => $this->type,
+            "modulename"            => $this->modulename,
+            "name"                  => $this->name,
+            "instance"              => $this->instance,
+            "context"               => $this->context,
+            "expected"              => $this->expected,
+            "section"               => $this->section,
+            "position"              => $this->position,
+            "url"                   => $this->url,
+            "icon"                  => $this->icon,
+            "required"              => $this->required,
+            "available"             => $this->available,
+            "status"                => $this->status,
+            "completionconditions"  => $this->completionconditions,
+            "opennewtab"            => $this->opennewtab,
+        ];
+    }
+
     public function get_type(): ?string
     {
         return $this->type;
@@ -179,7 +201,7 @@ class activity_details
         $completioninfo = new \completion_info($course);
         $completion = $completioninfo->get_data($cm, true, $userid);
 
-        if (!$cm->uservisible) {
+        if (!$cm->visible) {
             return self::LOCKED;
         }
 

@@ -10,7 +10,7 @@ class template_context extends model_manager
 {
     private bool $display_percentage;
 
-    private ?percentage_circle $percentage_circle_data = null;
+    private ?array $percentage_circle_data = null;
 
     private ?string $courseprogress_percentage = null;
 
@@ -28,10 +28,11 @@ class template_context extends model_manager
         if ($this->display_percentage) {
             $coursecompletiondetails = $this->course_completion_details($course);
 
-            $this->percentage_circle_data = new percentage_circle($course);
+            $percentagecircle = new percentage_circle($course);
+            $this->percentage_circle_data = $percentagecircle->buildrecord();
             $this->courseprogress_percentage = get_string('courseprogress_percentage', 'block_completion_monitor', $coursecompletiondetails['percentage']);
             $this->courseprogress_step = get_string('courseprogress_step', 'block_completion_monitor', $this->course_progress_step_details($coursecompletiondetails['completions']));
-            $this->activitiesdetails = $service->get_activities_details($course);
+            $this->activitiesdetails = array_map(fn(/** @var activity_details */ $activity) => $activity->buildrecord(), $activities);
         }
     }
 
