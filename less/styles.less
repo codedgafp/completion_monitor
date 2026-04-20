@@ -1,4 +1,5 @@
 @import "variables.less";
+@import "progress_bar.less";
 
 .block_completion_monitor {
     border-bottom: 3px solid #000 !important;
@@ -143,6 +144,32 @@
     .completion_monitor-link a {
         text-decoration: underline;
 
+    }
+
+    .completion_monitor-color-notstarted {
+        background-color: @progressbar-bgcolor-notstarted;
+        color: @progressbar-required-color
+    }
+
+    .completion_monitor-color-inprogress {
+        background-color: @progressbar-bgcolor-inprogress;
+        color: @progressbar-required-color
+    }
+
+    .completion_monitor-color-completed {
+        background-color: @progressbar-bgcolor-completed;
+        color: @progressbar-required-color
+    }
+
+    .completion_monitor-color-locked {
+        background-color: @progressbar-bgcolor-locked;
+        color: @progressbar-required-color
+    }
+
+    .completion_monitor-color-optional {
+        background: transparent;
+        color: @progressbar-optional-color;
+        border-color: @progressbar-optional-color;
     }
 }
 

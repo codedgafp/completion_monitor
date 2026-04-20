@@ -44,6 +44,7 @@ class template_context extends model_manager
             'courseprogress_percentage' => $this->courseprogress_percentage,
             'courseprogress_step' => $this->courseprogress_step,
             'activities_details' => $this->activitiesdetails,
+            'uniqid' => uniqid()
         ];
     }
 

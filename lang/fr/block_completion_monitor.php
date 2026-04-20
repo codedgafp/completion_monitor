@@ -18,7 +18,7 @@ $string['pluginname'] = 'Suivi des d\'achèvement des activités du cours';
 $string['blocktitle'] = 'Suivi des activités';
 $string['activities_completion_course_monitoring:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des activités et de la complétion du cours';
 
-$string['viewreport'] = 'Voir toutes les données de suivi' ;
+$string['viewreport'] = 'Voir toutes les données de suivi';
 $string['showmore'] = 'Voir plus';
 $string['showless'] = 'Réduire';
 
@@ -28,3 +28,28 @@ $string['courseprogress_step'] = '{$a->activitiescompleted} sur {$a->activitiest
 $string['region-top-block'] = 'Zone supérieure du cours';
 $string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités du cours';
 
+
+// Progress bar strings.
+$string['progressbar_region_label'] = 'Barre de progression';
+$string['activities_list_label'] = 'Activités du cours';
+$string['no_activities'] = 'Aucune activité à afficher';
+$string['scroll_left'] = 'Faire défiler vers la gauche';
+$string['scroll_right'] = 'Faire défiler vers la droite';
+
+// Activity details strings.
+$string['required_activity']               = 'Activité requise';
+$string['optional_activity']               = 'Activité optionnelle';
+$string['required_activities']               = 'Activités requises';
+$string['optional_activities']               = 'Activités optionnelles';
+$string['viewactivity']               = 'Voir l\'activité';
+$string['completionconditions_intro'] = 'Vous devez remplir les conditions suivantes pour terminer cette activité :';
+$string['condition_success'] = 'Condition remplie';
+$string['condition_error'] = 'Condition non remplie';
+
+$string['required'] = 'requise';
+$string['optional'] = 'optionnelle';
+
+$string['not_started'] = 'non commencée';
+$string['in_progress'] = 'en cours';
+$string['completed']   = 'validée';
+$string['locked']      = 'accès restreint';

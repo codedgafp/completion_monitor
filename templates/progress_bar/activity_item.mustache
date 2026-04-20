@@ -1,0 +1,34 @@
+{{!
+    Template : block_completion_monitor/progress_bar/activity_item
+    Activity item in progress bar list
+
+    Attempted data:
+      - id            {int}     activity id
+      - name          {string}  activity name
+      - type          {string}  activity type
+      - icon          {string}  activity icon
+      - required      {bool}    true = activity mandatory, false = activity optional
+      - status        {string}  'completed' | 'inprogress' | 'not_started' | 'locked'
+      - opennewtab    {bool}    true = open in new tab, false = open in same tab
+      - completionconditions {string}  JSON encoded array of completion conditions
+}}
+<li
+    role="button"
+    class="progressbar-item"
+    aria-expanded="false"
+    aria-haspopup="true"
+    tabindex="0"
+    data-id="{{id}}"
+    data-name="{{name}}"
+    data-type="{{type}}"
+    data-icon="{{icon}}"
+    data-url="{{url}}"
+    data-opennewtab="{{opennewtab}}"
+    data-status="{{status}}"
+    data-required="{{#required}}1{{/required}}{{^required}}0{{/required}}"
+    data-conditions="{{completionconditions}}"
+>
+    {{#icon_name}}
+        <i class="fa fa-{{icon_name}}" aria-hidden="true"></i>
+    {{/icon_name}}
+</li>

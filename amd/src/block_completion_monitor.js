@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'core_user/repository'
-], function ($, UserRepository) {
+    'core_user/repository',
+    'block_completion_monitor/progress_bar',
+], function ($, UserRepository, ProgressBar) {
     let block_completion_monitor = {
         /**
          * Init JS
@@ -15,9 +16,11 @@ define([
                     that.toggleBlock(preference);
                 });
 
+                that.initProgressBar();
+
                 $('.block_completion_monitor .open-block').on('click', function (e) {
-                    let openButton = $(e.currentTarget);
-                    let block = $('.block_completion_monitor .completion_monitor-content')[0];
+                    var openButton = $(e.currentTarget);
+                    var block = $('.block_completion_monitor .completion_monitor-content')[0];
 
                     if (block.classList.contains('hidden-block')) {
                         that.showMore(block, openButton);
@@ -36,8 +39,8 @@ define([
          */
         toggleBlock: function (open) {
 
-            let block = $('.block_completion_monitor .completion_monitor-content')[0];
-            let openButton = $('.block_completion_monitor .open-block');
+            var block = $('.block_completion_monitor .completion_monitor-content')[0];
+            var openButton = $('.block_completion_monitor .open-block');
 
             if (open == 1) {
                 this.showMore(block, openButton);
@@ -72,9 +75,25 @@ define([
             openButton.html('<button class="button-showless-showmore" aria-expanded="true">'
                 + M.util.get_string('showless', 'block_completion_monitor')
                 + ' <i class="fa fa-chevron-up"></i></button>');
-        }
-    }
+        },
 
+        initProgressBar: function () {
+            const $wrapper = $('.block_completion_monitor [data-region="progressbar"]');
+
+            if (!$wrapper.length) return;
+
+            this.progressBar = new ProgressBar($wrapper);
+
+            $wrapper.on('progressbar:activity:selected', (e, vm) => {
+                // TODO : afficher le panneau de détail de l'activité #MEN-1190
+                console.log('TODO : #MEN-1190 :', vm);
+            });
+
+            $(document).on('completion:viewed', (e, data) => {
+                this.progressBar.updateActivity(data.cmid, data.completionstate);
+            });
+        },
+    }
     window.block_completion_monitor = block_completion_monitor;
     return block_completion_monitor;
 });

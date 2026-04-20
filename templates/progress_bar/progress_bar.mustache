@@ -1,0 +1,68 @@
+{{!
+    Template : local_progressbar/progress_bar
+    Progress bar
+
+    Attempted data:
+      - activities       {Array}   list of activities to display in the progress bar, each with:
+        - id            {int}     activity id
+        - name          {string}  activity name
+        - type          {string}  activity type
+        - icon          {string}  activity icon
+        - required      {bool}    true = activity mandatory, false = activity optional
+        - status        {string}  'completed' | 'inprogress' | 'not_started' | 'locked'
+        - opennewtab    {bool}    true = open in new tab, false = open in same tab
+        - completionconditions {string}  JSON encoded array of completion conditions
+      - uniqid           {String}  identifiant unique de l'instance (pour aria)
+}}
+
+<div
+    class="progressbar_wrapper"
+    id="progressbar-wrapper-{{uniqid}}"
+    role="region"
+    aria-label="{{#str}} progressbar_region_label, block_completion_monitor {{/str}}"
+    data-region="progressbar"
+>
+    <button
+        class="progressbar_arrow progressbar_arrow-left hidden"
+        data-action="scroll-left"
+        aria-controls="progressbar-list-{{uniqid}}"
+        aria-label="{{#str}}scroll_left, block_completion_monitor{{/str}}"
+        tabindex="0"
+        type="button"
+    >
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+    </button>
+
+    <div
+        class="progressbar_list-viewport"
+        aria-hidden="false"
+    >
+        <ul
+            class="progressbar_list"
+            id="progressbar-list-{{uniqid}}"
+            role="list"
+            aria-label="{{#str}} activities_list_label, block_completion_monitor {{/str}}"
+        >
+            {{#activities_details}}
+                {{> block_completion_monitor/progress_bar/activity_item}}
+            {{/activities_details}}
+
+            {{^activities_details}}
+                <li class="progressbar_empty">
+                    {{#str}} no_activities, block_completion_monitor {{/str}}
+                </li>
+            {{/activities_details}}
+        </ul>
+    </div>
+
+    <button
+        class="progressbar_arrow progressbar_arrow-right hidden"
+        data-action="scroll-right"
+        aria-controls="progressbar-list-{{uniqid}}"
+        aria-label="{{#str}}scroll_right, block_completion_monitor{{/str}}"
+        tabindex="0"
+        type="button"
+    >
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </button>
+</div>

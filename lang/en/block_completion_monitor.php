@@ -28,3 +28,28 @@ $string['courseprogress_step'] = '{$a->activitiescompleted} out of {$a->activiti
 $string['region-top-block'] = 'Top region of the course';
 $string['completion_monitor:addinstance'] = 'Allow adding the Activities Completion Course Monitoring block';
 
+
+// Progress bar strings.
+$string['progressbar_region_label'] = 'Progress bar';
+$string['activities_list_label'] = 'Course activities';
+$string['no_activities'] = 'No activities to display';
+$string['scroll_left'] = 'Scroll left';
+$string['scroll_right'] = 'Scroll right';
+
+// Activity details strings.
+$string['required_activity']               = 'Required activity';
+$string['optional_activity']               = 'Optional activity';
+$string['required_activities']               = 'Required activities';
+$string['optional_activities']               = 'Optional activities';
+$string['viewactivity']               = 'View activity';
+$string['completionconditions_intro'] = 'You must meet the following conditions to complete this activity:';
+$string['condition_success'] = 'Condition met';
+$string['condition_error'] = 'Condition not met';
+
+$string['required'] = 'required';
+$string['optional'] = 'optional';
+
+$string['not_started'] = 'not started';
+$string['in_progress'] = 'in progress';
+$string['completed']   = 'completed';
+$string['locked']      = 'locked';
