@@ -22,47 +22,53 @@
     aria-label="{{#str}} progressbar_region_label, block_completion_monitor {{/str}}"
     data-region="progressbar"
 >
-    <button
-        class="progressbar_arrow progressbar_arrow-left hidden"
-        data-action="scroll-left"
-        aria-controls="progressbar-list-{{uniqid}}"
-        aria-label="{{#str}}scroll_left, block_completion_monitor{{/str}}"
-        tabindex="0"
-        type="button"
-    >
-        <i class="fa fa-chevron-left" aria-hidden="true"></i>
-    </button>
-
-    <div
-        class="progressbar_list-viewport"
-        aria-hidden="false"
-    >
-        <ul
-            class="progressbar_list"
-            id="progressbar-list-{{uniqid}}"
-            role="list"
-            aria-label="{{#str}} activities_list_label, block_completion_monitor {{/str}}"
+    <div class="progressbar_bar-row">
+        <button
+            class="progressbar_arrow progressbar_arrow-left hidden"
+            data-action="scroll-left"
+            aria-controls="progressbar-list-{{uniqid}}"
+            aria-label="{{#str}}scroll_left, block_completion_monitor{{/str}}"
+            tabindex="0"
+            type="button"
         >
-            {{#activities_details}}
-                {{> block_completion_monitor/progress_bar/activity_item}}
-            {{/activities_details}}
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        </button>
 
-            {{^activities_details}}
-                <li class="progressbar_empty">
-                    {{#str}} no_activities, block_completion_monitor {{/str}}
-                </li>
-            {{/activities_details}}
-        </ul>
+        <div
+            class="progressbar_list-viewport"
+            aria-hidden="false"
+        >
+            <ul
+                class="progressbar_list"
+                id="progressbar-list-{{uniqid}}"
+                role="list"
+                aria-label="{{#str}} activities_list_label, block_completion_monitor {{/str}}"
+            >
+                {{#activities_details}}
+                    {{> block_completion_monitor/progress_bar/activity_item}}
+                {{/activities_details}}
+
+                {{^activities_details}}
+                    <li class="progressbar_empty">
+                        {{#str}} no_activities, block_completion_monitor {{/str}}
+                    </li>
+                {{/activities_details}}
+            </ul>
+        </div>
+
+        <button
+            class="progressbar_arrow progressbar_arrow-right hidden"
+            data-action="scroll-right"
+            aria-controls="progressbar-list-{{uniqid}}"
+            aria-label="{{#str}}scroll_right, block_completion_monitor{{/str}}"
+            tabindex="0"
+            type="button"
+        >
+            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        </button>
     </div>
-
-    <button
-        class="progressbar_arrow progressbar_arrow-right hidden"
-        data-action="scroll-right"
-        aria-controls="progressbar-list-{{uniqid}}"
-        aria-label="{{#str}}scroll_right, block_completion_monitor{{/str}}"
-        tabindex="0"
-        type="button"
-    >
-        <i class="fa fa-chevron-right" aria-hidden="true"></i>
-    </button>
+    <div class="progressbar_bottom-row">
+        <div id="progressbar_detail" class="progressbar_detail-container" aria-live="polite" aria-atomic="true"></div>
+        {{> block_completion_monitor/legend/legend }}
+    </div>
 </div>

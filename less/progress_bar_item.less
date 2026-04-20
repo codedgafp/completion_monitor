@@ -1,0 +1,82 @@
+.progressbar-item {
+    background: none;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.1s;
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &:focus-visible,
+    &:focus {
+        box-shadow: none !important; 
+        outline-color: rgba(@progress-main-blue-color, 0.5) !important;
+    }
+
+    &[aria-current="true"] {
+        outline: 3px solid @progress-main-blue-color !important;
+        outline-offset: 3px !important;
+    }
+
+    &-circle {
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        background: transparent;
+    }
+
+    &-square {
+        border-radius: 8px;
+        border: none;
+    }
+
+    .fa {
+        font-size: 14px;
+        line-height: 1;
+        pointer-events: none;
+    }
+}
+
+.completion_monitor-link {
+    text-align: right;
+}
+
+.completion_monitor-link a {
+    text-decoration: underline;
+
+}
+
+.completion_monitor-color-notstarted {
+    background-color: @progressbar-bgcolor-notstarted;
+    color: @progressbar-required-color
+}
+
+.completion_monitor-color-inprogress {
+    background-color: @progressbar-bgcolor-inprogress;
+    color: @progressbar-required-color
+}
+
+.completion_monitor-color-completed {
+    background-color: @progressbar-bgcolor-completed;
+    color: @progressbar-required-color
+}
+
+.completion_monitor-color-locked {
+    background-color: @progressbar-bgcolor-locked;
+    color: @progressbar-required-color
+}
+
+.completion_monitor-color-optional {
+    background: transparent;
+    color: @progressbar-optional-color;
+    border-color: @progressbar-optional-color;
+}

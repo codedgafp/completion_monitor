@@ -1,11 +1,30 @@
 .completion_monitor-content {
     .progressbar_wrapper {
         display: flex;
-        align-items: center;
-        gap: 4px;
         width: 100%;
-        overflow: hidden;
+        flex-direction: column;
         position: relative;
+        gap: 8px;
+
+        .progressbar_bar-row,
+        .progressbar_bottom-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 4px;
+        }
+
+        .progressbar_bottom-row {
+            margin-bottom: 10px;
+            .progressbar_detail-container {
+                flex: 1;
+            }
+
+            .progressbar_legend-container {
+                flex-shrink: 0;
+                margin-left: auto;
+            }
+        }
     }
 
     .progressbar_list-viewport {
@@ -13,6 +32,7 @@
         overflow-y: hidden;
         flex: 1;
         scrollbar-width: none;
+
         &::-webkit-scrollbar {
             display: none;
         }
@@ -25,54 +45,6 @@
         margin-bottom: 0;
         padding: 6px 6px;
         transition: transform 0.25s ease;
-    }
-
-    .progressbar-item {
-        background: none;
-        border: none;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 34px;
-        height: 34px;
-        flex-shrink: 0;
-        padding: 0;
-        cursor: pointer;
-        text-decoration: none;
-        transition: opacity 0.15s, transform 0.1s;
-
-        &:hover {
-            opacity: 0.85;
-        }
-
-        &:focus-visible,
-        &:focus {
-            box-shadow: none;
-            outline-color: rgba(@progress-main-blue-color, 0.5);
-        }
-
-        &[aria-current="true"] {
-            outline: 3px solid @progress-main-blue-color;
-            outline-offset: 3px;
-        }
-
-        &-circle {
-            border-radius: 50%;
-            border: 2px solid currentColor;
-            background: transparent;
-        }
-
-        &-square {
-            border-radius: 8px;
-            border: none;
-        }
-
-        .fa {
-            font-size: 14px;
-            line-height: 1;
-            pointer-events: none;
-        }
     }
 
     .progressbar_separator {

@@ -1,0 +1,96 @@
+.progressbar_legend-container {
+    position: relative;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.progressbar_legend-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: @progress-main-blue-color;
+    outline: 1px solid @progressbar-optional-color;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 0;
+
+    &[aria-expanded="true"] {
+        outline: none;
+        background-color: @progress-secondary-blue-color;
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba(@progress-main-blue-color, 0.5);
+        outline-offset: 2px;
+    }
+
+    .fa {
+        -webkit-text-stroke: 0;
+    }
+}
+
+.progressbar_legend-content {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: max-content;
+    background: #fff;
+    padding: 16px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.progressbar_legend-column {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.progressbar_legend-label {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.progressbar_legend-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.progressbar_legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+
+    .progressbar-item {
+        width: 30px;
+        height: 30px;
+        font-size: 10px;
+    }
+}
+
+.progressbar_legend-grid {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.progressbar_legend-modal {
+    .modal-title {
+        background-image: none !important;
+        padding-left: 0 !important;
+    }
+}
+
+// Mobile — disable dropdown -> use modal instead
+@media(max-width: @screen-sm) {
+    .progressbar_legend-content {
+        display: none;
+    }
+}

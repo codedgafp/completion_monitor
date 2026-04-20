@@ -3,7 +3,8 @@ define([
     'core_user/repository',
     'block_completion_monitor/progress_bar',
     'block_completion_monitor/activity_detail',
-], function ($, UserRepository, ProgressBar, ActivityDetail) {
+    'block_completion_monitor/legend',
+], function ($, UserRepository, ProgressBar, ActivityDetail, Legend) {
     let block_completion_monitor = {
         /**
          * Init JS
@@ -18,6 +19,7 @@ define([
                 });
 
                 that.initProgressBar();
+                that.initLegend();
 
                 $('.block_completion_monitor .open-block').on('click', function (e) {
                     var openButton = $(e.currentTarget);
@@ -96,6 +98,12 @@ define([
                 this.progressBar.updateActivity(data.cmid, data.completionstate);
             });
         },
+
+        initLegend: function () {
+            this.legend = new Legend(
+                $('.block_completion_monitor .progressbar_legend-container')
+            );
+        }
     }
     window.block_completion_monitor = block_completion_monitor;
     return block_completion_monitor;
