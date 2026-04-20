@@ -117,6 +117,12 @@ define([
             };
         }
 
+        updateActivity(activityId, newStatus) {
+
+            this.activityList.updateItem(activityId, newStatus);
+            this._updateArrows();
+        }
+
         /**
          * Destroy the component and clean up listeners.
          */

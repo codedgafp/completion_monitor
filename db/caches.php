@@ -10,4 +10,9 @@ $definitions = [
         'simplekeys' => true,
         'simpledata' => true,
     ],
+    'activities_reset' => [
+        'mode' => store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+    ],
 ];

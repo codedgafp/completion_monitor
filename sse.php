@@ -24,37 +24,57 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
 
-$cache = cache::make('block_completion_monitor', 'completion_percentage');
+$cache_percentage = cache::make('block_completion_monitor', 'completion_percentage');
 $percentagekey = "completion_percentage_{$userid}_{$courseid}";
+
+$cache_activities_reset = cache::make('block_completion_monitor', 'activities_reset');
+$resetactivitieskey = "completion_reset_activities_{$userid}_{$courseid}";
 
 $start = time();
 $maxDuration = 20;
-
-$flush = false;
+$events = [];
 
 while ((time() - $start) < $maxDuration) {
     if (connection_aborted()) {
         break;
     }
 
-    $completionvalues = $cache->get_many([$percentagekey]);
+    $events = [];
+    
+    $completionvalues = $cache_percentage->get_many([$percentagekey]);
     $percentage = $completionvalues[$percentagekey];
+    $cache_activities_reset_value = $cache_activities_reset->get_many([$resetactivitieskey]);
+    $need_activities_reset = $cache_activities_reset_value[$resetactivitieskey];
+    $templateContext = [];
 
-    if ($percentage !== false) {
-        flush_completion_percentage_event_data($course, $percentage);
-        $flush = true;
+    if ($percentage !== false || $need_activities_reset !== false) {
+        $completiondetailsmodel = new template_context($course);
+        $templateContext = $completiondetailsmodel->get_template_context();
     }
 
-    if ($flush) {
-        $cache->delete_many([$percentagekey]);
+    if ($percentage !== false && !empty($templateContext)) {
+        $events[] = build_completion_percentage_event_data($percentage, $templateContext);
+    }
+
+    if ($need_activities_reset !== false && !empty($templateContext)) {
+        $events[] = build_activities_event_data($templateContext);
+    }
+
+
+    if (count($events) > 0) {
+        $cache_percentage->delete_many([$percentagekey]);
+        $cache_activities_reset->delete_many([$resetactivitieskey]);
+
+        foreach ($events as $event) {
+            echo $event;
+        }
+        echo "event: done\ndata: {}\n\n";
 
         if (ob_get_level() > 0) {
             ob_flush();
         }
 
         flush();
-
-        $flush = false;
         break;
     }
 
@@ -64,20 +84,35 @@ while ((time() - $start) < $maxDuration) {
 /**
  * Set the information for "completion_update" event
  * 
- * @param stdClass $course
  * @param int $percentage
+ * @param array $templateContext
  * @return void
  */
-function flush_completion_percentage_event_data(\stdClass $course, int $percentage)
+function build_completion_percentage_event_data(int $percentage, array $templateContext)
 {
-    $completiondetailsmodel = new template_context($course);
-
     $data = json_encode([
         'completion_percentage' => $percentage,
-        'completion_details' => $completiondetailsmodel->get_template_context()
+        'completion_details' => $templateContext
     ]);
 
-    echo "event: completion_update\n";
-    echo "data: $data";
-    echo "\n\n";
+    return "event: completion_update\n"
+        . "data: $data"
+        . "\n\n";
+}
+
+/**
+ * Set the information for "activities_update" event
+ * 
+ * @param array $templateContext
+ * @return void
+ */
+function build_activities_event_data(array $templateContext)
+{
+    $data = json_encode([
+        'activities_details' => $templateContext['activities_details'] ?? []
+    ]);
+
+    return "event: activities_update\n"
+        . "data: $data"
+        . "\n\n";
 }

@@ -33,10 +33,14 @@ define([], function () {
             });
 
             source.addEventListener('completion_update', (e) => {
-                e.preventDefault();
-
                 this.updateCompletionInformation(e.data);
+            });
 
+            source.addEventListener('activities_update', (e) => {
+                this.updateActivities(e.data);
+            });
+
+            source.addEventListener('done', () => {
                 source.close();
                 this.reopen();
             });
@@ -48,7 +52,7 @@ define([], function () {
          * @return {void}
          */
         reopen: function () {
-            setTimeout(this.openSSE(), 500);
+            setTimeout(() => this.openSSE(), 500);
         },
 
         /**
@@ -79,6 +83,25 @@ define([], function () {
                 courseprogressstep.textContent = completion_details.courseprogress_step;
             });
         },
+
+        /**
+         * Updates the progress bar activities
+         * 
+         * @param {string} data 
+         */
+        updateActivities: function (data) {
+            const parsed = JSON.parse(data);
+            const activities = parsed?.activities_details || [];
+            if (!window.block_completion_monitor?.progressBar) return;
+
+            activities.forEach((activity) => {
+                window.block_completion_monitor.progressBar.updateActivity(
+                    activity.id,
+                    activity.status
+                );
+            });
+        },
+
     };
 
     window.completion_monitor_dynamic = completion_monitor_dynamic;

@@ -36,9 +36,13 @@ class observer
         $service = new completion_monitor_service($course);
         $coursecompletiondetails = $service->get_course_completion_details($userid);
 
-        $cache = cache::make('block_completion_monitor', 'completion_percentage');
-        $cache->set_many([
+        $cache_percentage = cache::make('block_completion_monitor', 'completion_percentage');
+        $cache_percentage->set_many([
             "completion_percentage_{$userid}_{$courseid}" => $coursecompletiondetails['percentage'],
+        ]);
+        $cache_activities_reset = cache::make('block_completion_monitor', 'activities_reset');
+        $cache_activities_reset->set_many([
+            "completion_reset_activities_{$userid}_{$courseid}" => true,
         ]);
     }
 

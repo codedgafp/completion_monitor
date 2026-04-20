@@ -16,7 +16,7 @@ define(['jquery', 'block_completion_monitor/activity_item'], function ($, Activi
             let $items = this.$el.find('.progressbar-item');
             $items.each((index, el) => {
                 const $el = $(el);
-                const id = $el.data('activity-id');
+                const id = $el.data('id');
                 this.items.set(id, new ActivityItem($el));
 
                 if (index < $items.length - 1)
