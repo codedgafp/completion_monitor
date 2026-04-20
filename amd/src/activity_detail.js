@@ -1,0 +1,107 @@
+define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core/str'], function (Utils, Templates, Str) {
+    'use strict';
+    const { getColorClass, COMPONENT, ICON_MAP } = Utils;
+
+    class ActivityDetail {
+
+        constructor($container) {
+            this.$container = $container;
+            this.activity = null;
+        }
+
+        /**
+         * Build the badge label.
+         * @param  {boolean} required
+         * @param  {string}  status
+         * @return {Promise<string>}
+        */
+        _getBadgeLabel = async (required, status) => {
+            return Promise.all([
+                Str.get_string(required ? 'required' : 'optional', COMPONENT),
+                Str.get_string(status, COMPONENT),
+            ]).then(([obligation, statusLabel]) => {
+                obligation = obligation.charAt(0).toUpperCase() + obligation.slice(1);
+                statusLabel = statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1);
+                return `${obligation} - ${statusLabel}`;
+            });
+        };
+
+        _applyBadgeIcon() {
+            const badgeIconName = ICON_MAP[this.activity?.status];
+            if (!badgeIconName)
+                return;
+
+            this.$container.find('.progressbar_detail-badge').prepend(
+                $('<i>', {
+                    class: `fa fa-${badgeIconName}`,
+                    'aria-hidden': 'true',
+                })
+            );
+        }
+
+
+        async _render(vm) {
+            const context = {
+                name: vm.name,
+                type: vm.type,
+                url: vm.url,
+                opennewtab: vm.opennewtab,
+                status: vm.status,
+                is_required: vm.required,
+                icon: vm.icon,
+                badge_label: await this._getBadgeLabel(vm.required, vm.status),
+                badge_color_class: getColorClass(vm.status, vm.required),
+                completionconditions: typeof vm.completionconditions === 'string'
+                    ? JSON.parse(vm.completionconditions || '[]')
+                    : (vm.completionconditions || []),
+            };
+
+            this.$container.html(
+                await Templates.render(
+                    'block_completion_monitor/progress_activity_detail/activity_detail',
+                    context
+                )
+            );
+        
+            this._applyBadgeIcon();
+
+            if(vm.opennewtab) 
+                this.$container.find('.progressbar_detail-link').attr('target', '_blank');
+
+            this._notifyItem(this.activity, true);
+        }
+
+        _notifyItem(id, isOpen) {
+            this.activity?.el.trigger(isOpen ? 'progressbar:detail:opened' : 'progressbar:detail:closed', [id]);
+        }
+
+        /**
+         * Show activity detail.
+         * If it's the same activity, close the panel.
+         *
+         * @param {Object} vm - ViewModel of the activity
+         */
+        toggle(vm) {
+            if (this.activity?.id === vm.id) {
+                this.close();
+                return;
+            }
+
+            if (this.activity !== null) {
+                this._notifyItem(this.activity, false);
+            }
+
+            this.activity = vm;
+            this._render(vm);
+        }
+
+        close() {
+            this._notifyItem(this.activity, false);
+            this.$container.find('.progressbar_detail-link').removeAttr('target');
+            this.activity = null;
+            this.$container.empty();
+        }
+    }
+
+    return ActivityDetail;
+});

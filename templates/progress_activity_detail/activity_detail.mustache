@@ -1,0 +1,51 @@
+{{!
+    Template : block_completion_monitor/progress_activity_detail/activity_detail
+    Variables attendues :
+      - name                  {string}
+      - url                   {string}
+      - is_required           {bool}
+      - status                {string}
+      - completionconditions  {Array}  - status {bool}, description {string}
+}}
+<div class="progressbar_detail" role="region">
+    <div class="progressbar_detail-header">
+        <h3 class="progressbar_detail-name" aria-label="{{name}}">
+            <img src="{{icon}}" class="progressbar_detail-icon activityicon" alt="{{type}}" />
+            <span>{{name}}</span>
+        </h3>
+        <span class="progressbar_detail-badge {{badge_color_class}}" aria-hidden="true">
+            {{badge_label}}
+        </span>
+        {{#url}}
+        <a href="{{url}}" class="progressbar_detail-link">
+            {{#str}} viewactivity, block_completion_monitor {{/str}} 
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+        </a>
+        {{/url}}
+    </div>
+
+    <div class="progressbar_detail-conditions">
+        <p>{{#str}} completionconditions_intro, block_completion_monitor {{/str}}</p>
+        <ul>
+            {{#completionconditions}}
+                <li>
+                    <span class="progressbar_detail-condition">
+                        {{description}}
+                        {{#status}}
+                            <i class="fa fa-check-circle progressbar_detail-condition-success" 
+                            role="img"
+                            aria-label="{{#str}}condition_success, block_completion_monitor{{/str}}"
+                            ></i>
+                        {{/status}}
+                        {{^status}}
+                            <i class="fa fa-times-circle progressbar_detail-condition-error"
+                            role="img"
+                            aria-label="{{#str}}condition_error, block_completion_monitor{{/str}}"
+                            ></i>
+                        {{/status}}
+                    </span>    
+                </li>
+            {{/completionconditions}}
+        </ul>
+    </div>
+</div>

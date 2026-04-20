@@ -87,6 +87,18 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
                 this.$el.removeAttr('aria-current');
                 this.$el.removeAttr('aria-controls');
             });
+
+            this.$el.on('progressbar:detail:opened', () => {
+                this.$el.attr('aria-expanded', 'true');
+                this.$el.attr('aria-current', 'true');
+                this.$el.attr('aria-controls', 'progressbar_detail');
+            });
+
+            this.$el.on('progressbar:detail:closed', () => {
+                this.$el.attr('aria-expanded', 'false');
+                this.$el.removeAttr('aria-current');
+                this.$el.removeAttr('aria-controls');
+            });
         }
 
         /**

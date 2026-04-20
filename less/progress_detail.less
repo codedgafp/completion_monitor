@@ -1,0 +1,91 @@
+.progressbar_detail-container {
+    margin-top: 12px;
+
+    &:empty {
+        display: none;
+    }
+
+}
+
+.progressbar_detail {
+    font-size: 14px;
+
+    &-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+
+    &-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: @progress-main-blue-color;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: normal;
+        margin: 0;
+    }
+
+    &-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        text-transform: uppercase;
+
+        &.completion_monitor-color-optional {
+            border: solid 1px;
+            padding: 1px 7px;
+        }
+    }
+
+    &-link,
+    &-link:hover {
+        font-size: 14px;
+        text-decoration: none;
+        color: @progress-main-blue-color;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+
+        .fa {
+            margin-left: 4px;
+            vertical-align: middle;
+            -webkit-text-stroke: 0px !important;
+        }
+    }
+
+    &-link:hover {
+        opacity: 0.85;
+    }
+
+
+    &-conditions {
+        p {
+            margin-bottom: 6px;
+        }
+
+        ul {
+            padding-left: 30px;
+        }
+    }
+
+    &-condition {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+
+        &-success {
+            color: @progressbar-bgcolor-completed;
+        }
+
+        &-error {
+            color: @progressbar-bgcolor-locked;
+        }
+    }
+}

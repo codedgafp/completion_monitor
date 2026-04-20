@@ -22,7 +22,7 @@
 
     <div class="completion_monitor-content">
         {{> block_completion_monitor/progress_bar/progress_bar }}
-        {{> block_completion_monitor/progress_header/course_progress_details }}
+        <div id="progressbar_detail" class="progressbar_detail-container" aria-live="polite" aria-atomic="true"></div>
     </div>
 
     {{#can_access_report}}

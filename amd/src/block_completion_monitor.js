@@ -2,7 +2,8 @@ define([
     'jquery',
     'core_user/repository',
     'block_completion_monitor/progress_bar',
-], function ($, UserRepository, ProgressBar) {
+    'block_completion_monitor/activity_detail',
+], function ($, UserRepository, ProgressBar, ActivityDetail) {
     let block_completion_monitor = {
         /**
          * Init JS
@@ -83,10 +84,12 @@ define([
             if (!$wrapper.length) return;
 
             this.progressBar = new ProgressBar($wrapper);
+            this.activityDetail = new ActivityDetail(
+                $('.block_completion_monitor .progressbar_detail-container')
+            );
 
             $wrapper.on('progressbar:activity:selected', (e, vm) => {
-                // TODO : afficher le panneau de détail de l'activité #MEN-1190
-                console.log('TODO : #MEN-1190 :', vm);
+                this.activityDetail.toggle(vm);
             });
 
             $(document).on('completion:viewed', (e, data) => {
