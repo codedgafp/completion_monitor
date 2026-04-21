@@ -37,7 +37,9 @@ define([], function () {
             });
 
             source.addEventListener('activities_update', (e) => {
-                this.updateActivities(e.data);
+                parsedData = JSON.parse(e.data);
+                this.updateActivities(parsedData);
+                this.updateDetail(parsedData);
             });
 
             source.addEventListener('done', () => {
@@ -90,16 +92,34 @@ define([], function () {
          * @param {string} data 
          */
         updateActivities: function (data) {
-            const parsed = JSON.parse(data);
-            const activities = parsed?.activities_details || [];
-            if (!window.block_completion_monitor?.progressBar) return;
+            const activities = data?.activities_details || [];
+            const progressBar = window.block_completion_monitor?.progressBar;
+            if (!progressBar) return;
 
             activities.forEach((activity) => {
-                window.block_completion_monitor.progressBar.updateActivity(
+                progressBar.updateActivity(
                     activity.id,
                     activity.status
                 );
             });
+        },
+
+        /**
+         * Updates the progress bar activities
+         * 
+         * @param {string} data 
+         */
+        updateDetail: function (data) {
+            const activities = data?.activities_details || [];
+            const activityDetail = window.block_completion_monitor?.activityDetail;
+
+            if (!activityDetail) return;
+
+            const selectedActivity = activities.find((activity) => {
+                return activity.id && activity.id === activityDetail?.activity?.id;
+            });
+
+            if (selectedActivity) activityDetail.updateDetail(selectedActivity);
         },
 
     };

@@ -108,8 +108,14 @@ function build_completion_percentage_event_data(int $percentage, array $template
  */
 function build_activities_event_data(array $templateContext)
 {
+    $activities_details = $templateContext['activities_details'] ?? [];
+    $activities_details = array_map(function($activity) {
+        $activity['icon'] = $activity['icon'] ? $activity['icon']->out() : null;
+        return $activity;
+    }, $activities_details);
+
     $data = json_encode([
-        'activities_details' => $templateContext['activities_details'] ?? []
+        'activities_details' => $activities_details
     ]);
 
     return "event: activities_update\n"

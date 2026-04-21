@@ -95,6 +95,11 @@ define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core
             this._render(vm);
         }
 
+        updateDetail(activity) {
+            if (!this.activity || this.activity.id !== activity.id) return;
+            this._render(activity);
+        }
+
         close() {
             this._notifyItem(this.activity, false);
             this.$container.find('.progressbar_detail-link').removeAttr('target');
