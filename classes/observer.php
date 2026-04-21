@@ -36,34 +36,43 @@ class observer
         $service = new completion_monitor_service($course);
         $coursecompletiondetails = $service->get_course_completion_details($userid);
 
-        $cache_percentage = cache::make('block_completion_monitor', 'completion_percentage');
-        $cache_percentage->set_many([
+        $cachepercentage = cache::make('block_completion_monitor', 'completion_percentage');
+        $cachepercentage->set_many([
             "completion_percentage_{$userid}_{$courseid}" => $coursecompletiondetails['percentage'],
         ]);
-        $cache_activities_reset = cache::make('block_completion_monitor', 'activities_reset');
-        $cache_activities_reset->set_many([
+        $cacheactivitiesreset = cache::make('block_completion_monitor', 'activities_reset');
+        $cacheactivitiesreset->set_many([
             "completion_reset_activities_{$userid}_{$courseid}" => true,
         ]);
     }
 
     public static function set_course_module_status_in_progress(\core\event\course_module_viewed $event): void
     {
-        global $USER;
-
         $data = $event->get_data();
-        $userid = $USER->id;
+
+        $userid = $data['userid'];
+        $courseid = $data['courseid'];
         $cmid = $data["contextinstanceid"];
 
-        $course = get_course($data['courseid']);
+        $course = get_course($courseid);
         $service = new completion_monitor_service($course);
 
         $userpreferencename = $service->course_module_viewed_preference_name($userid, $cmid);
+
+        if (get_user_preferences($userpreferencename, null, $userid)) {
+            return;
+        }
+
         $userpreferencedata = json_encode([
             "time_access" => time(),
             "user_id" => $userid,
             "course_module_id" => $cmid
         ]);
-
         set_user_preference($userpreferencename, $userpreferencedata);
+
+        $cacheactivitiesreset = cache::make('block_completion_monitor', 'activities_reset');
+        $cacheactivitiesreset->set_many([
+            "completion_reset_activities_{$userid}_{$courseid}" => true,
+        ]);
     }
 }

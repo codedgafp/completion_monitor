@@ -24,10 +24,10 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
 
-$cache_percentage = cache::make('block_completion_monitor', 'completion_percentage');
+$cachepercentage = cache::make('block_completion_monitor', 'completion_percentage');
 $percentagekey = "completion_percentage_{$userid}_{$courseid}";
 
-$cache_activities_reset = cache::make('block_completion_monitor', 'activities_reset');
+$cacheactivitiesreset = cache::make('block_completion_monitor', 'activities_reset');
 $resetactivitieskey = "completion_reset_activities_{$userid}_{$courseid}";
 
 $start = time();
@@ -40,14 +40,14 @@ while ((time() - $start) < $maxDuration) {
     }
 
     $events = [];
-    
-    $completionvalues = $cache_percentage->get_many([$percentagekey]);
+
+    $completionvalues = $cachepercentage->get_many([$percentagekey]);
     $percentage = $completionvalues[$percentagekey];
-    $cache_activities_reset_value = $cache_activities_reset->get_many([$resetactivitieskey]);
-    $need_activities_reset = $cache_activities_reset_value[$resetactivitieskey];
+    $cacheactivitiesresetvalue = $cacheactivitiesreset->get_many([$resetactivitieskey]);
+    $needactivitiesreset = $cacheactivitiesresetvalue[$resetactivitieskey];
     $templateContext = [];
 
-    if ($percentage !== false || $need_activities_reset !== false) {
+    if ($percentage !== false || $needactivitiesreset !== false) {
         $completiondetailsmodel = new template_context($course);
         $templateContext = $completiondetailsmodel->get_template_context();
     }
@@ -56,14 +56,14 @@ while ((time() - $start) < $maxDuration) {
         $events[] = build_completion_percentage_event_data($percentage, $templateContext);
     }
 
-    if ($need_activities_reset !== false && !empty($templateContext)) {
+    if ($needactivitiesreset !== false && !empty($templateContext)) {
         $events[] = build_activities_event_data($templateContext);
     }
 
 
     if (count($events) > 0) {
-        $cache_percentage->delete_many([$percentagekey]);
-        $cache_activities_reset->delete_many([$resetactivitieskey]);
+        $cachepercentage->delete_many([$percentagekey]);
+        $cacheactivitiesreset->delete_many([$resetactivitieskey]);
 
         foreach ($events as $event) {
             echo $event;
@@ -86,9 +86,9 @@ while ((time() - $start) < $maxDuration) {
  * 
  * @param int $percentage
  * @param array $templateContext
- * @return void
+ * @return string
  */
-function build_completion_percentage_event_data(int $percentage, array $templateContext)
+function build_completion_percentage_event_data(int $percentage, array $templateContext): string
 {
     $data = json_encode([
         'completion_percentage' => $percentage,
@@ -104,9 +104,9 @@ function build_completion_percentage_event_data(int $percentage, array $template
  * Set the information for "activities_update" event
  * 
  * @param array $templateContext
- * @return void
+ * @return string
  */
-function build_activities_event_data(array $templateContext)
+function build_activities_event_data(array $templateContext): string
 {
     $activities_details = $templateContext['activities_details'] ?? [];
     $activities_details = array_map(function($activity) {
