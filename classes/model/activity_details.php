@@ -193,7 +193,7 @@ class activity_details
      */
     private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm): string
     {
-        global $USER, $DB;
+        global $USER;
 
         $service = new completion_monitor_service($course);
 
@@ -205,18 +205,16 @@ class activity_details
             return self::LOCKED;
         }
 
-        if ($service->course_module_has_beed_viewed($userid, $cm->id)) {
-            $repository = new completion_monitor_repository();
-            // Finds submissions for a user in a course.
-            $submissions = $repository->get_user_course_submissions($course->id, $userid);
-            $submission = $submissions["$userid-$cm->id"] ?? null;
+        $completionviewed = $service->course_module_has_beed_viewed($userid, $cm->id) ? COMPLETION_INCOMPLETE : null;
 
-            $completionstate = $this->get_completion_state($completion, $submission);
+        $repository = new completion_monitor_repository();
+        // Finds submissions for a user in a course.
+        $submissions = $repository->get_user_course_submissions($course->id, $userid);
+        $submission = $submissions["$userid-$cm->id"] ?? null;
 
-            return $this->completion_state_map($completionstate);
-        }
-
-        return self::NOTSTARTED;
+        $completionstate = $this->get_completion_state($completion, $submission);
+        
+        return is_null($completionviewed) && !$completionstate ? self::NOTSTARTED : $this->completion_state_map($completionstate);
     }
 
     /**
