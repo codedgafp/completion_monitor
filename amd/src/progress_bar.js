@@ -17,6 +17,7 @@ define([
                 activities
             );
 
+            this._handleMobileOrder();
             this._bindEvents();
             this._updateArrows();
         }
@@ -61,7 +62,10 @@ define([
                 setTimeout(() => this._updateArrows(), 50);
             });
 
-            const onResize = this._debounce(() => this._updateArrows(), 120);
+            const onResize = this._debounce(() => { 
+                this._updateArrows();
+                this._handleMobileOrder();
+            }, 120);
             $(window).on('resize.progressbar', onResize);
         }
 
@@ -102,6 +106,18 @@ define([
 
             this.$arrowLeft.toggleClass('hidden', !overflow || atStart);
             this.$arrowRight.toggleClass('hidden', !overflow || atEnd);
+        }
+
+        _handleMobileOrder() {
+            const $bottomRow = this.$el.find('.progressbar_bottom-row');
+            const $legend = this.$el.find('.progressbar_legend-container');
+            const $detail = this.$el.find('.progressbar_detail-container');
+
+            if ($(window).width() < 768) {
+                $bottomRow.prepend($legend);
+            } else {
+                $bottomRow.append($legend);
+            }
         }
 
         _hasOverflow() {

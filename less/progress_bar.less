@@ -16,6 +16,9 @@
 
         .progressbar_bottom-row {
             margin-bottom: 10px;
+            margin-top: 10px;
+            align-items: flex-start;
+
             .progressbar_detail-container {
                 flex: 1;
             }
@@ -23,6 +26,16 @@
             .progressbar_legend-container {
                 flex-shrink: 0;
                 margin-left: auto;
+            }
+
+            @media(max-width: @screen-sm) {
+                flex-direction: column;
+
+                .progressbar_legend-container {
+                    margin-left: unset;
+                    margin-right: auto;
+                    margin-bottom: 10px;
+                }
             }
         }
     }
@@ -69,7 +82,10 @@
         flex-shrink: 0;
         border-radius: 50%;
         transition: background 0.15s;
-        -webkit-text-stroke: 0;
+
+        .fa {
+            -webkit-text-stroke: 0px;
+        }
 
         &:hover {
             background: rgba(0, 0, 0, 0.08);

@@ -9,11 +9,11 @@
 }}
 <div class="progressbar_detail" role="region">
     <div class="progressbar_detail-header">
-        <h3 class="progressbar_detail-name" aria-label="{{name}}">
+        <h3 class="progressbar_detail-name" aria-label="{{type}}, {{name}}">
             <img src="{{icon}}" class="progressbar_detail-icon activityicon" alt="{{type}}" />
             <span>{{name}}</span>
         </h3>
-        <span class="progressbar_detail-badge {{badge_color_class}}" aria-hidden="true">
+        <span class="progressbar_detail-badge {{badge_color_class}}" aria-label="{{badge_label}}">
             {{badge_label}}
         </span>
         {{#url}}

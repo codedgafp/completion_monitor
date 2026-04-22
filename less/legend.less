@@ -82,9 +82,20 @@
 }
 
 .progressbar_legend-modal {
-    .modal-title {
-        background-image: none !important;
-        padding-left: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    .modal-dialog {
+        margin: 0;
+
+        .modal-title {
+            background-image: none !important;
+        }
+
+        &:not([data-role="flexitour-step"]) .modal-title {
+            padding-left: 0 !important;
+        }
     }
 }
 
