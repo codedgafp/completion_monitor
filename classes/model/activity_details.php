@@ -213,17 +213,17 @@ class activity_details
         $submission = $submissions["$userid-$cm->id"] ?? null;
 
         $completionstate = $this->get_completion_state($completion, $submission);
-        
+
         return is_null($completionviewed) && !$completionstate ? self::NOTSTARTED : $this->completion_state_map($completionstate);
     }
 
     /**
      * Map Moodle's completion statuses to those of the completion_monitor block
      * 
-     * @param int $state
+     * @param int|null $state
      * @return string
      */
-    private function completion_state_map(int $state): string
+    private function completion_state_map(int|null $state): string
     {
         switch ($state) {
             case COMPLETION_INCOMPLETE:
