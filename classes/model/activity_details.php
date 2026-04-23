@@ -201,7 +201,7 @@ class activity_details
         $completioninfo = new \completion_info($course);
         $completion = $completioninfo->get_data($cm, true, $userid);
 
-        if (!$cm->visible) {
+        if (!$cm->visible || !$cm->available) {
             return self::LOCKED;
         }
 

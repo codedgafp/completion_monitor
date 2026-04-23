@@ -32,8 +32,9 @@ class template_context extends model_manager
             $this->percentage_circle_data = $percentagecircle->buildrecord();
             $this->courseprogress_percentage = get_string('courseprogress_percentage', 'block_completion_monitor', $coursecompletiondetails['percentage']);
             $this->courseprogress_step = get_string('courseprogress_step', 'block_completion_monitor', $this->course_progress_step_details($coursecompletiondetails['completions']));
-            $this->activitiesdetails = array_map(fn(/** @var activity_details */ $activity) => $activity->buildrecord(), $activities);
         }
+
+        $this->activitiesdetails = array_map(fn(/** @var activity_details */ $activity) => $activity->buildrecord(), $activities);
     }
 
     public function get_template_context(): ?array
