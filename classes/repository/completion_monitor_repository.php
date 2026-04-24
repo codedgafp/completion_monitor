@@ -316,14 +316,12 @@ class completion_monitor_repository
                                 cm.id = :cmid
                             ', ['cmid' => $cmid]);
     }
-    public function get_sessions_trainings_without_block(): iterable
+    public function get_course_list(): iterable
     {
         $sql = "
             SELECT c.*
             FROM {course} c
-            JOIN {context} ctx
-            ON ctx.instanceid = c.id
-            AND ctx.contextlevel = :courselevel
+            JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :courselevel
             WHERE c.id <> :siteid
             AND NOT EXISTS (
                     SELECT 1
@@ -331,19 +329,13 @@ class completion_monitor_repository
                     WHERE bi.parentcontextid = ctx.id
                     AND bi.blockname = :blockname
             )
-            AND (
-                    EXISTS (
-                        SELECT 1
-                        FROM {session} s
-                        WHERE s.courseshortname = c.shortname
-                    )
-            OR EXISTS (
-                        SELECT 1
-                        FROM {training} t
-                        WHERE t.courseshortname = c.shortname
-                    )
-            )
-        ";
+            AND EXISTS (
+                SELECT 1
+                FROM {course_modules} cm
+                WHERE cm.course = c.id
+                AND cm.deletioninprogress = 0
+                AND cm.completion <> 0
+            );";
 
         $rs = $this->db->get_recordset_sql($sql, [
             'courselevel' => CONTEXT_COURSE,

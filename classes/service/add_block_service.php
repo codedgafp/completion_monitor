@@ -29,7 +29,7 @@ class add_block_service
 
         $transaction = $DB->start_delegated_transaction();
 
-        foreach ($this->completionmonitorrepository->get_sessions_trainings_without_block() as $course) {
+        foreach ($this->completionmonitorrepository->get_course_list() as $course) {
             $service = new completion_monitor_service($course);
             $service->add_block_to_course();
 
