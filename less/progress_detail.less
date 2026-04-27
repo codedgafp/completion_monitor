@@ -69,11 +69,14 @@
 
         ul {
             padding-left: 30px;
+
+            li {
+                margin-bottom: 4px;
+            }
         }
     }
 
     &-condition {
-        display: flex;
         align-items: center;
         gap: 6px;
         margin-bottom: 4px;
@@ -84,6 +87,9 @@
 
         &-error {
             color: @progressbar-bgcolor-locked;
+        }
+        i {
+            margin-left: 4px;
         }
     }
 }
