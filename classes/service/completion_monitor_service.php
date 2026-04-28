@@ -285,6 +285,15 @@ class completion_monitor_service
     }
 
     /**
+     * @param int $courseid
+     * @return string
+     */
+    public function block_completion_monitor_opened_preference_name(int $courseid): string
+    {
+        return "block_completion_monitor_" . $courseid . "_opened";
+    }
+
+    /**
      * @param int $userid
      * @param int $cmid
      * @return bool

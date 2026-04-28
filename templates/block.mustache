@@ -14,13 +14,16 @@
         </div>
 
         <div class="open-block">
-            <button class="button-showless-showmore">
-                {{#str}} showmore, block_completion_monitor {{/str}}
-            </button>
+            {{#showblockcontent}}
+                {{> block_completion_monitor/progress_header/show_less_button }}
+            {{/showblockcontent}}
+            {{^showblockcontent}}
+                {{> block_completion_monitor/progress_header/show_more_button }}
+            {{/showblockcontent}}
         </div>
     </div>
 
-    <div class="completion_monitor-content">
+    <div class="completion_monitor-content {{^showblockcontent}}hidden-block{{/showblockcontent}}">
         {{> block_completion_monitor/progress_bar/progress_bar }}
         {{#can_access_report}}
         <div class="completion_monitor-moodle-footer">
