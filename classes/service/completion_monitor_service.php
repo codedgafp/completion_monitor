@@ -147,35 +147,34 @@ class completion_monitor_service
         $modinfo = get_fast_modinfo($course, $USER->id);
         $sections = $modinfo->get_sections();
 
-        $coursemodules = $modinfo->instances;
+        $coursemodules = $modinfo->get_cms();
         $activities = [];
 
         $coursecompletioncriterialist = $this->db->get_records('course_completion_criteria', ['course' => $course->id]);
 
         // Create activities list with completion set.
-        foreach ($coursemodules as $module => $instances) {
-            $modulename = get_string('pluginname', $module);
-
-            foreach ($instances as $cm) {
-                if ($cm->completion === COMPLETION_TRACKING_NONE || !$cm->is_visible_on_course_page()) {
-                    continue;
-                }
-
-                $required = $this->is_activity_required($coursecompletioncriterialist, $cm->id, $module, $coursecompletionactivities);
-
-                $activitydetails = new activity_details($cm);
-                $activitydetails->set_type($module);
-                $activitydetails->set_modulename($modulename);
-                $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
-                $activitydetails->set_required($required);
-
-                //Due to the Patch Edunao mentor: display scorm in a new tab or not.
-                if ($cm->name === 'scorm') {
-                    $this->set_opennewtab_for_scorm($activitydetails, $cm);
-                }
-
-                $activities[] = $activitydetails;
+        foreach ($coursemodules as $cm) {
+            if ($cm->completion === COMPLETION_TRACKING_NONE || !$cm->is_visible_on_course_page()) {
+                continue;
             }
+
+            $module = $cm->modname;
+            $modulename = $cm->get_module_type_name();
+
+            $required = $this->is_activity_required($coursecompletioncriterialist, $cm->id, $module, $coursecompletionactivities);
+
+            $activitydetails = new activity_details($cm);
+            $activitydetails->set_type($module);
+            $activitydetails->set_modulename($modulename);
+            $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
+            $activitydetails->set_required($required);
+
+            //Due to the Patch Edunao mentor: display scorm in a new tab or not.
+            if ($cm->name === 'scorm') {
+                $this->set_opennewtab_for_scorm($activitydetails, $cm);
+            }
+
+            $activities[] = $activitydetails;
         }
 
         return $activities;
