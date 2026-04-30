@@ -220,14 +220,15 @@ class activity_details
     /**
      * Map Moodle's completion statuses to those of the completion_monitor block
      * 
-     * @param int|null $state
+     * @param int|string|null $state
      * @return string
      */
-    private function completion_state_map(int|null $state): string
+    private function completion_state_map(int|string|null $state): string
     {
         switch ($state) {
             case COMPLETION_INCOMPLETE:
             case COMPLETION_COMPLETE_FAIL:
+            case ASSIGN_SUBMISSION_STATUS_SUBMITTED :
                 $completionstate = self::INPROGRESS;
                 break;
 
