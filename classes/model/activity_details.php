@@ -171,13 +171,23 @@ class activity_details
             $completiondata = $completioninfo->get_data($coursemodule, false, $USER->id);
             $conditions = [
                 [
-                    "status" => (int) ($completiondata->completionstate == COMPLETION_COMPLETE),
+                    "status" => $completiondata->completionstate == COMPLETION_COMPLETE,
                     "description" => get_string('markcomplete', 'completion')
                 ]
             ];
         } else {
             $cmcompletion = cm_completion_details::get_instance($coursemodule, $USER->id);
             $cmcompletiondetails = $cmcompletion->get_details();
+
+            /**
+             *  For the "status" variable, the values "0" or "1" are converted to booleans.
+             *  In a Mustache template, comparisons only work with booleans.
+             */
+            array_map(
+                fn($completiondetails) => $completiondetails->status = (bool) $completiondetails->status,
+                $cmcompletiondetails
+            );
+
             $conditions = array_values(array_filter($cmcompletiondetails));
         }
 
