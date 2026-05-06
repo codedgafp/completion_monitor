@@ -3,6 +3,7 @@
 namespace block_completion_monitor\model;
 
 use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -24,8 +25,9 @@ class template_context extends model_manager
     {
         global $USER;
 
-        $service = new completion_monitor_service($course);
-        $activities = $service->get_activities_details($course);
+        $completionactivitiesservice = new completion_activities_service($course);
+
+        $activities = $completionactivitiesservice->get_activities_details();
 
         $this->display_percentage = $this->display_percentage($activities);
 
@@ -40,7 +42,8 @@ class template_context extends model_manager
 
         $this->activitiesdetails = array_map(fn(/** @var activity_details */ $activity) => $activity->buildrecord(), $activities);
 
-        $userpreferencename = $service->block_completion_monitor_opened_preference_name($course->id);
+        $completionmonitorservice = new completion_monitor_service($course);
+        $userpreferencename = $completionmonitorservice->block_completion_monitor_opened_preference_name();
         $this->showblockcontent = get_user_preferences($userpreferencename, false, $USER->id);
     }
 

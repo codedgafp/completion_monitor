@@ -1,7 +1,7 @@
 <?php
 
 use block_completion_monitor\helper\progress;
-use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
 use block_completion_monitor\repository\completion_monitor_repository;
 
 defined('MOODLE_INTERNAL');
@@ -67,7 +67,7 @@ class block_completion_monitor_helper_testcase extends advanced_testcase
         $completion = new \completion_info($course);
         $completion->update_state($instance2cm, COMPLETION_COMPLETE, $student->id);
 
-        $service = new completion_monitor_service($course);
+        $service = new completion_activities_service($course);
 
         $exclusions = $this->repository->get_grade_exclusions($course->id, $student->id);
         $activities = $service->get_filtered_activities($student->id, $exclusions);

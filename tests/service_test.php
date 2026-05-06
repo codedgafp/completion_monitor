@@ -2,6 +2,7 @@
 
 use block_completion_monitor\model\activity_details;
 use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
 use block_completion_monitor\repository\completion_monitor_repository;
 
 defined('MOODLE_INTERNAL');
@@ -19,16 +20,22 @@ class block_completion_monitor_service_testcase extends advanced_testcase
     private \stdClass $course;
 
     /**
-     * Activities Completion Course Monitoring service
+     * Activities Completion Course Monitoring repository
      * @var completion_monitor_repository
      */
     private completion_monitor_repository $repository;
 
     /**
-     * Activities Completion Course Monitoring service
+     * Completion Course Monitoring service
      * @var completion_monitor_service
      */
-    private completion_monitor_service $service;
+    private completion_monitor_service $completionmonitorservice;
+
+    /**
+     * Activities Completion Course Monitoring service
+     * @var completion_activities_service
+     */
+    private completion_activities_service $completionactivitiesservice;
 
     protected function setUp(): void
     {
@@ -42,8 +49,9 @@ class block_completion_monitor_service_testcase extends advanced_testcase
             'enablecompletion' => 1,
         ]);
 
-        $this->service = new completion_monitor_service($this->course);
         $this->repository = new completion_monitor_repository();
+        $this->completionmonitorservice = new completion_monitor_service($this->course);
+        $this->completionactivitiesservice = new completion_activities_service($this->course);
     }
 
     public function test_get_filtered_activities()
@@ -56,7 +64,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
         $exclusions = $this->repository->get_grade_exclusions($this->course->id, $USER->id);
 
-        $filteractivities = $this->service->get_filtered_activities($USER->id, $exclusions);
+        $filteractivities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
         self::assertCount(0, $filteractivities);
 
         $record = new stdClass();
@@ -74,7 +82,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criterion = new completion_criteria_activity();
         $criterion->update_config($criteriadata);
 
-        $filteractivities = $this->service->get_filtered_activities($USER->id, $exclusions);
+        $filteractivities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
         self::assertCount(0, $filteractivities);
 
         $record = new stdClass();
@@ -95,13 +103,13 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criterion = new completion_criteria_activity();
         $criterion->update_config($criteriadata);
 
-        $filteractivities = $this->service->get_filtered_activities($USER->id, $exclusions);
+        $filteractivities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
 
         self::assertCount(1, $filteractivities);
 
         $exclusions[] = $filteractivities[0]->get_type() . '-' . $filteractivities[0]->get_instance() . '-' . $USER->id;
 
-        $filteractivities = $this->service->get_filtered_activities($USER->id, $exclusions);
+        $filteractivities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
 
         self::assertCount(0, $filteractivities);
 
@@ -128,13 +136,13 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
         self::setUser($user1);
 
-        $filteractivities = $this->service->get_filtered_activities($USER->id, $exclusions);
+        $filteractivities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
 
         self::assertCount(1, $filteractivities);
 
         self::setAdminUser();
 
-        $filteractivities = $this->service->get_filtered_activities($USER->id, $exclusions);
+        $filteractivities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
 
         self::assertCount(2, $filteractivities);
     }
@@ -175,22 +183,18 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $completion = new completion_info($this->course);
         $completion->update_state($instance2cm, COMPLETION_COMPLETE, $student->id);
 
-        $coursecompletionpercentage = $this->service->get_course_completion_details($student->id);
+        $coursecompletionpercentage = $this->completionactivitiesservice->get_course_completion_details($student->id);
 
         self::assertEquals(50, $coursecompletionpercentage['percentage']);
     }
 
     public function test_completion_get_activities_details_ok()
     {
-        $courserecord = new stdClass();
-        $courserecord->enablecompletion = 1;
-        $course = $this->getDataGenerator()->create_course($courserecord);
-
         $record = new stdClass();
-        $record->course = $course;
+        $record->course = $this->course;
         $this->getDataGenerator()->create_module('forum', $record);
 
-        $activities = $this->service->get_activities_details($course);
+        $activities = $this->completionactivitiesservice->get_activities_details();
         self::assertCount(0, $activities);
 
         $record->completion = 1;
@@ -199,22 +203,18 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $record->completionunlocked = 1;
         $this->getDataGenerator()->create_module('url', $record);
 
-        $activities = $this->service->get_activities_details($course);
+        $activities = $this->completionactivitiesservice->get_activities_details();
         self::assertCount(1, $activities);
     }
 
     public function test_completion_get_required_details_activities_ok()
     {
-        $courserecord = new stdClass();
-        $courserecord->enablecompletion = 1;
-        $course = $this->getDataGenerator()->create_course($courserecord);
-
         $record = new stdClass();
-        $record->course = $course;
+        $record->course = $this->course;
 
         $this->getDataGenerator()->create_module('forum', $record);
 
-        $activities = $this->service->get_activities_details($course);
+        $activities = $this->completionactivitiesservice->get_activities_details();
         self::assertCount(0, $activities);
 
         $record->completion = 1;
@@ -228,7 +228,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
         // create course completion, and add the second url activity as criteria
         $criteriadata = (object) [
-            'id' => $course->id,
+            'id' => $this->course->id,
             'criteria_activity' => [
                 $url2cm->id => 1
             ]
@@ -236,7 +236,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criterion = new completion_criteria_activity();
         $criterion->update_config($criteriadata);
 
-        $activities = $this->service->get_activities_details($course);
+        $activities = $this->completionactivitiesservice->get_activities_details();
         $requiredactivities = array_filter($activities, fn(activity_details $activity) => $activity->get_required() == true);
 
         self::assertCount(1, $requiredactivities);
@@ -248,13 +248,12 @@ class block_completion_monitor_service_testcase extends advanced_testcase
     {
         $this->setAdminUser();
 
-
         $context = \context_course::instance($this->course->id);
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertFalse($exists);
 
-        $this->service->add_block_to_course();
+        $this->completionmonitorservice->add_block_to_course();
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertTrue($exists);
@@ -266,12 +265,12 @@ class block_completion_monitor_service_testcase extends advanced_testcase
 
         $context = \context_course::instance($this->course->id);
 
-        $this->service->add_block_to_course();
+        $this->completionmonitorservice->add_block_to_course();
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertTrue($exists);
 
-        $this->service->remove_block_from_course();
+        $this->completionmonitorservice->remove_block_from_course();
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertFalse($exists);
@@ -294,13 +293,14 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criteriadata = (object) [
             'id' => $this->course->id,
             'criteria_activity' => [
-            $instancecm->id => 1
+                $instancecm->id => 1
             ]
         ];
         $criterion = new completion_criteria_activity();
-        $criterion->update_config($criteriadata);   
+        $criterion->update_config($criteriadata);
 
-        $activitiesdetails = $this->service->get_activities_details($this->course);
+        $activitiesdetails = $this->completionactivitiesservice->get_activities_details();
+
         $activitydetails = current($activitiesdetails);
         self::assertNotNull($activitydetails);
         $completionconditions = json_decode($activitydetails->get_completionconditions(), true);
@@ -337,7 +337,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criterion = new completion_criteria_activity();
         $criterion->update_config($criteriadata);   
 
-        $activitiesdetails = $this->service->get_activities_details($this->course);
+        $activitiesdetails = $this->completionactivitiesservice->get_activities_details();
         $activitydetails = current($activitiesdetails);
         self::assertNotNull($activitydetails);
         self::assertTrue($activitydetails->get_opennewtab());
@@ -352,7 +352,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertFalse($exists);
 
-        $this->service->add_block_to_course();
+        $this->completionmonitorservice->add_block_to_course();
 
         $exists = $this->repository->block_instance_exists($context->id);
         self::assertTrue($exists);
@@ -368,7 +368,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         self::setAdminUser();
 
 
-        $shoulddisplay = $this->service->should_display_block($this->course->id);
+        $shoulddisplay = $this->completionactivitiesservice->should_display_block();
         self::assertFalse($shoulddisplay);
 
         $record = new stdClass();
@@ -391,7 +391,7 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criterion = new completion_criteria_activity();
         $criterion->update_config($criteriadata);
 
-        $shoulddisplay = $this->service->should_display_block($this->course->id);
+        $shoulddisplay = $this->completionactivitiesservice->should_display_block();
         self::assertTrue($shoulddisplay);
     }
 

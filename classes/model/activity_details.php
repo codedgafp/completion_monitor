@@ -55,8 +55,9 @@ class activity_details
 
     public function __construct(\cm_info $cm, \completion_info $completioninfo = null)
     {
+        $course = get_course($cm->course);
+
         if ($completioninfo == null) {
-            $course = get_course($cm->course);
             $completioninfo = new \completion_info($course);
         }
 
@@ -238,7 +239,7 @@ class activity_details
         switch ($state) {
             case COMPLETION_INCOMPLETE:
             case COMPLETION_COMPLETE_FAIL:
-            case ASSIGN_SUBMISSION_STATUS_SUBMITTED :
+            case ASSIGN_SUBMISSION_STATUS_SUBMITTED:
                 $completionstate = self::INPROGRESS;
                 break;
 

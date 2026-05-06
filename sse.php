@@ -1,6 +1,7 @@
 <?php
 
 use block_completion_monitor\model\template_context;
+use block_completion_monitor\service\completion_activities_service;
 
 require_once(__DIR__ . '/../../config.php');
 
@@ -24,11 +25,11 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
 
-$cachepercentage = cache::make('block_completion_monitor', 'completion_percentage');
-$percentagekey = "completion_percentage_{$userid}_{$courseid}";
+$blockcompletioncached = cache::make('block_completion_monitor', 'block_completion_updated');
 
-$cacheactivitiesreset = cache::make('block_completion_monitor', 'activities_reset');
+$percentagekey = "completion_percentage_{$userid}_{$courseid}";
 $resetactivitieskey = "completion_reset_activities_{$userid}_{$courseid}";
+$cachekeys = [$percentagekey, $resetactivitieskey];
 
 $start = time();
 $maxDuration = 20;
@@ -41,29 +42,36 @@ while ((time() - $start) < $maxDuration) {
 
     $events = [];
 
-    $completionvalues = $cachepercentage->get_many([$percentagekey]);
-    $percentage = $completionvalues[$percentagekey];
-    $cacheactivitiesresetvalue = $cacheactivitiesreset->get_many([$resetactivitieskey]);
-    $needactivitiesreset = $cacheactivitiesresetvalue[$resetactivitieskey];
-    $templateContext = [];
+    $blockcompletioncachedvalues = $blockcompletioncached->get_many($cachekeys);
 
-    if ($percentage !== false || $needactivitiesreset !== false) {
-        $completiondetailsmodel = new template_context($course);
-        $templateContext = $completiondetailsmodel->get_template_context();
+    $updatedpercentage = $blockcompletioncachedvalues[$percentagekey];
+    $needactivitiesreset = $blockcompletioncachedvalues[$resetactivitieskey];
+
+    $coursecompletionpercentage = -1;
+    $templatecontext = [];
+
+    if ($updatedpercentage !== false) {
+        $service = new completion_activities_service($course);
+        $coursecompletiondetails = $service->get_course_completion_details($userid);
+
+        $coursecompletionpercentage = $coursecompletiondetails['percentage'];
     }
 
-    if ($percentage !== false && !empty($templateContext)) {
-        $events[] = build_completion_percentage_event_data($percentage, $templateContext);
+    if ($needactivitiesreset !== false) {
+        $templatecontextmodel = new template_context($course);
+        $templatecontext = $templatecontextmodel->get_template_context();
     }
 
-    if ($needactivitiesreset !== false && !empty($templateContext)) {
-        $events[] = build_activities_event_data($templateContext);
+    if ($coursecompletionpercentage >= 0 && !empty($templatecontext)) {
+        $events[] = build_completion_percentage_event_data($coursecompletionpercentage, $templatecontext);
     }
 
+    if (!empty($templatecontext)) {
+        $events[] = build_activities_event_data($templatecontext);
+    }
 
     if (count($events) > 0) {
-        $cachepercentage->delete_many([$percentagekey]);
-        $cacheactivitiesreset->delete_many([$resetactivitieskey]);
+        $blockcompletioncached->delete_many($cachekeys);
 
         foreach ($events as $event) {
             echo $event;
@@ -109,8 +117,8 @@ function build_completion_percentage_event_data(int $percentage, array $template
 function build_activities_event_data(array $templateContext): string
 {
     $activities_details = $templateContext['activities_details'] ?? [];
-    $activities_details = array_map(function($activity) {
-        $activity['icon'] = $activity['icon'] ? $activity['icon']->out() : null;
+    $activities_details = array_map(function ($activity) {
+        $activity['icon'] = $activity['icon'] ?->out();
         return $activity;
     }, $activities_details);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace block_completion_monitor;
 
 use cache;
@@ -10,19 +11,16 @@ class observer
 {
     public static function course_module_changed($event): void
     {
-
         $courseid = $event->courseid;
         $course = get_course($courseid);
 
         $service = new completion_monitor_service($course);
 
-        $hascompletion = $service->activities_has_completion($courseid);
+        $hascompletion = $service->activities_has_completion();
 
-        if ($hascompletion) {
-            $service->add_block_to_course();
-        } else {
-            $service->remove_block_from_course();
-        }
+        $hascompletion
+            ? $service->add_block_to_course()
+            : $service->remove_block_from_course();
     }
 
     public static function completion_updated(\core\event\course_module_completion_updated $event): void
@@ -31,17 +29,10 @@ class observer
 
         $userid = $data['relateduserid'];
         $courseid = $data['courseid'];
-        $course = get_course($courseid);
 
-        $service = new completion_monitor_service($course);
-        $coursecompletiondetails = $service->get_course_completion_details($userid);
-
-        $cachepercentage = cache::make('block_completion_monitor', 'completion_percentage');
+        $cachepercentage = cache::make('block_completion_monitor', 'block_completion_updated');
         $cachepercentage->set_many([
-            "completion_percentage_{$userid}_{$courseid}" => $coursecompletiondetails['percentage'],
-        ]);
-        $cacheactivitiesreset = cache::make('block_completion_monitor', 'activities_reset');
-        $cacheactivitiesreset->set_many([
+            "completion_percentage_{$userid}_{$courseid}" => true,
             "completion_reset_activities_{$userid}_{$courseid}" => true,
         ]);
     }
@@ -70,9 +61,7 @@ class observer
         ]);
         set_user_preference($userpreferencename, $userpreferencedata);
 
-        $cacheactivitiesreset = cache::make('block_completion_monitor', 'activities_reset');
-        $cacheactivitiesreset->set_many([
-            "completion_reset_activities_{$userid}_{$courseid}" => true,
-        ]);
+        $cacheactivitiesreset = cache::make('block_completion_monitor', 'block_completion_updated');
+        $cacheactivitiesreset->set("completion_reset_activities_{$userid}_{$courseid}", true);
     }
 }

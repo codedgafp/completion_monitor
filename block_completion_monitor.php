@@ -1,6 +1,6 @@
 <?php
 
-use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -22,12 +22,10 @@ class block_completion_monitor extends block_base
         return true;
     }
 
-
     public function hide_header()
     {
         return true;
     }
-
 
     /**
      * Allows the block to load any JS it requires into the page.
@@ -52,11 +50,12 @@ class block_completion_monitor extends block_base
         $this->content = new \stdClass();
         $this->content->text = '';
         // Check if the block should be displayed for the course.
-        $service = new completion_monitor_service($this->page->course);
-        if (!$service->should_display_block($this->page->course->id)) {
+        $service = new completion_activities_service($this->page->course);
+        if (!$service->should_display_block()) {
             return $this->content;
         }
-        
+
+        /** @var block_completion_monitor\output\renderer */
         $renderer = $this->page->get_renderer('block_completion_monitor');
 
         $this->content = new \stdClass();

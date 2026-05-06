@@ -2,7 +2,7 @@
 
 namespace block_completion_monitor\model;
 
-use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -12,7 +12,7 @@ abstract class model_manager
     {
         global $USER;
 
-        $service = new completion_monitor_service($course);
+        $service = new completion_activities_service($course);
         return $service->get_course_completion_details($USER->id);
     }
 }

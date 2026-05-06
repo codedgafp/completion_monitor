@@ -5,12 +5,7 @@ use core_cache\store;
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
-    'completion_percentage' => [
-        'mode' => store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => true,
-    ],
-    'activities_reset' => [
+    'block_completion_updated' => [
         'mode' => store::MODE_APPLICATION,
         'simplekeys' => true,
         'simpledata' => true,

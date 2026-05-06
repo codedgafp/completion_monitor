@@ -7,15 +7,14 @@ defined('MOODLE_INTERNAL') || die();
 use block_completion_monitor\repository\completion_monitor_repository;
 class add_block_service
 {
-
-    
     /**
      * Activities Completion Course Monitoring repository
      * @var completion_monitor_repository
      */
     protected completion_monitor_repository $completionmonitorrepository;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->completionmonitorrepository = new completion_monitor_repository();
     }
 

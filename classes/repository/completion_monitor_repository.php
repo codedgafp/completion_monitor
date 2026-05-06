@@ -300,7 +300,7 @@ class completion_monitor_repository
 
     public function block_instance_exists(int $contextId): bool
     {
-        return  $this->db->record_exists('block_instances', [
+        return $this->db->record_exists('block_instances', [
             'blockname' => 'completion_monitor',
             'parentcontextid' => $contextId
         ]);
