@@ -95,7 +95,7 @@ class completion_activities_service
         foreach ($activities as /** @var activity_details */ $activity) {
             $coursemodule = $modinfo->cms[$activity->get_id()];
 
-            if (!$coursemodule->visible && !$canviewhiddenactivities && !$coursemodule->is_visible_on_course_page()) {
+            if (!$coursemodule->visible && !$canviewhiddenactivities) {
                 continue;
             }
 
@@ -140,11 +140,23 @@ class completion_activities_service
 
         $coursecompletioncriterialist = $this->db->get_records('course_completion_criteria', ['course' => $this->course->id]);
 
+        $coursecontext = \context_course::instance($this->course->id);
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
+
         // Create activities list with completion set.
         foreach ($coursemodules as $cm) {
-            if ($cm->completion === COMPLETION_TRACKING_NONE || !$cm->is_visible_on_course_page()) {
+            if ($cm->completion === COMPLETION_TRACKING_NONE || $cm->is_visible_on_course_page() === null)
                 continue;
+
+            $available = true;
+
+            if (isset($cm->availability)) {
+                $availability = json_decode($cm->availability);
+                $available = array_values($availability->showc)[0];
             }
+
+            if ($canviewhiddenactivities == false && $available == false)
+                continue;
 
             $module = $cm->modname;
             $modulename = $cm->get_module_type_name();
