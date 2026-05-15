@@ -77,6 +77,16 @@ define([
             });
             modal.getRoot().addClass('progressbar_legend-modal');
             modal.show();
+
+            modal.getRoot().on('click', (e) => {
+                if ($(e.target).hasClass('modal') || $(e.target).hasClass('modal-backdrop')) {
+                    modal.destroy();
+                }
+            });
+
+            $(document).one('click', '.modal-backdrop', () => {
+                modal.destroy();
+            });
         }
     }
 
