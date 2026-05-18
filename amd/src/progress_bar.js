@@ -133,9 +133,8 @@ define([
             };
         }
 
-        updateActivity(activityId, newStatus) {
-
-            this.activityList.updateItem(activityId, newStatus);
+        updateActivity(activityId, updateDataList) {
+            this.activityList.updateItem(activityId, updateDataList);
             this._updateArrows();
         }
 

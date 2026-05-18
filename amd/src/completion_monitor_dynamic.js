@@ -97,9 +97,14 @@ define([], function () {
             if (!progressBar) return;
 
             activities.forEach((activity) => {
+                updateDataList = [{
+                    status: activity.status,
+                    completionConditions: activity.completionconditions
+                }];
+
                 progressBar.updateActivity(
                     activity.id,
-                    activity.status
+                    updateDataList
                 );
             });
         },
@@ -110,11 +115,11 @@ define([], function () {
          * @param {string} data 
          */
         updateDetail: function (data) {
-            const activities = data?.activities_details || [];
             const activityDetail = window.block_completion_monitor?.activityDetail;
 
             if (!activityDetail) return;
 
+            const activities = data?.activities_details || [];
             const selectedActivity = activities.find((activity) => {
                 return activity.id && activity.id === activityDetail?.activity?.id;
             });

@@ -54,6 +54,8 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
 
         _bindEvents() {
             this.$el.on('click', (e) => {
+                this.completionconditions = this.completionconditions ?? JSON.parse(this.$el.attr('data-conditions') || '[]');
+
                 this.$el.trigger('progressbar:item:select', [{
                     id: this.$el.data('id'),
                     name: this.$el.data('name'),
@@ -63,7 +65,7 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
                     icon: this.$el.data('icon'),
                     status: this.status,
                     required: this.required,
-                    completionconditions: JSON.parse(this.$el.attr('data-conditions') || '[]'),
+                    completionconditions: this.completionconditions,
                     el: this.$el,
                 }]);
 
@@ -87,29 +89,18 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
                 this.$el.removeAttr('aria-current');
                 this.$el.removeAttr('aria-controls');
             });
-
-            this.$el.on('progressbar:detail:opened', () => {
-                this.$el.attr('aria-expanded', 'true');
-                this.$el.attr('aria-current', 'true');
-                this.$el.attr('aria-controls', 'progressbar_detail');
-            });
-
-            this.$el.on('progressbar:detail:closed', () => {
-                this.$el.attr('aria-expanded', 'false');
-                this.$el.removeAttr('aria-current');
-                this.$el.removeAttr('aria-controls');
-            });
         }
 
         /**
          * Update item on status update.
-         * @param {string} newStatus
+         * @param {object} updateDataList
          */
-        update(newStatus) {
+        update(updateDataList) {
             this.$el.removeClass(getColorClass(this.status, this.required));
             this.$el.find('.fa').remove();
 
-            this.status = newStatus;
+            this.status = updateDataList.status;
+            this.completionconditions = updateDataList.completionConditions;
             this._applyClasses();
             this._applyIcon();
         }

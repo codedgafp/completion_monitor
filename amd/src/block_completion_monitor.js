@@ -86,10 +86,6 @@ define([
             $wrapper.on('progressbar:activity:selected', (e, vm) => {
                 this.activityDetail.toggle(vm);
             });
-
-            $(document).on('completion:viewed', (e, data) => {
-                this.progressBar.updateActivity(data.cmid, data.completionstate);
-            });
         },
 
         initLegend: function () {

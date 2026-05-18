@@ -61,11 +61,11 @@ define(['jquery', 'block_completion_monitor/activity_item'], function ($, Activi
          * Update activity status by activity id.
          *
          * @param {number} activityId
-         * @param {string} newStatus
+         * @param {object} updateDataList
          */
-        updateItem(activityId, newStatus) {
+        updateItem(activityId, updateDataList) {
             const item = this.items.get(activityId);
-            item?.update(newStatus);
+            item?.update(updateDataList);
         }
 
         /**
