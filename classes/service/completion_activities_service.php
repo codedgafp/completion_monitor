@@ -2,6 +2,7 @@
 
 namespace block_completion_monitor\service;
 
+use cm_info;
 use course_modinfo;
 use moodle_database;
 use block_completion_monitor\helper\progress;
@@ -145,39 +146,62 @@ class completion_activities_service
 
         // Create activities list with completion set.
         foreach ($coursemodules as $cm) {
-            if ($cm->completion === COMPLETION_TRACKING_NONE || $cm->is_visible_on_course_page() === null)
-                continue;
-
             $available = true;
 
             if (isset($cm->availability)) {
                 $availability = json_decode($cm->availability);
-                $available = array_values($availability->showc)[0];
+                $available = (bool) array_values($availability->showc)[0];
             }
 
-            if ($canviewhiddenactivities == false && $available == false)
+            $hasnocompletion = $cm->completion === COMPLETION_TRACKING_NONE;
+            $isnotvisible = $cm->get_user_visible();
+
+            if ($hasnocompletion || !$isnotvisible) {
+                if (isset($cm->availability) && $available) {
+                    $activities[] = $this->build_activity_details($cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
+                }
+
                 continue;
-
-            $module = $cm->modname;
-            $modulename = $cm->get_module_type_name();
-
-            $required = $this->is_activity_required($coursecompletioncriterialist, $cm->id, $module, $coursecompletionactivities);
-
-            $activitydetails = new activity_details($cm, $coursecompletion);
-            $activitydetails->set_type($module);
-            $activitydetails->set_modulename($modulename);
-            $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
-            $activitydetails->set_required($required);
-
-            //Due to the Patch Edunao mentor: display scorm in a new tab or not.
-            if ($activitydetails->get_type() === 'scorm') {
-                $this->set_opennewtab_for_scorm($activitydetails, $cm);
             }
 
-            $activities[] = $activitydetails;
+            if (!$canviewhiddenactivities && !$available) {
+                continue;
+            }
+
+            $activities[] = $this->build_activity_details($cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
         }
 
         return $activities;
+    }
+
+    private function build_activity_details(
+        cm_info $cm,
+        object  $coursecompletion,
+        array   $coursecompletioncriterialist,
+        array   $coursecompletionactivities,
+        array   $sections
+    ): activity_details
+    {
+        $module = $cm->modname;
+        $required = $this->is_activity_required(
+            $coursecompletioncriterialist,
+            $cm->id,
+            $module,
+            $coursecompletionactivities
+        );
+
+        $activitydetails = new activity_details($cm, $coursecompletion);
+        $activitydetails->set_type($module);
+        $activitydetails->set_modulename($cm->get_module_type_name());
+        $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
+        $activitydetails->set_required($required);
+
+        // Due to the Patch Edunao mentor: display scorm in a new tab or not.
+        if ($module === 'scorm') {
+            $this->set_opennewtab_for_scorm($activitydetails, $cm);
+        }
+
+        return $activitydetails;
     }
 
     /**
