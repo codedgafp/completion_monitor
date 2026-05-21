@@ -97,10 +97,10 @@ define([], function () {
             if (!progressBar) return;
 
             activities.forEach((activity) => {
-                updateDataList = [{
+                updateDataList = {
                     status: activity.status,
                     completionConditions: activity.completionconditions
-                }];
+                };
 
                 progressBar.updateActivity(
                     activity.id,
