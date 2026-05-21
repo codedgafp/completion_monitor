@@ -170,7 +170,7 @@ class completion_activities_service
             $activitydetails->set_required($required);
 
             //Due to the Patch Edunao mentor: display scorm in a new tab or not.
-            if ($cm->name === 'scorm') {
+            if ($activitydetails->get_type() === 'scorm') {
                 $this->set_opennewtab_for_scorm($activitydetails, $cm);
             }
 
@@ -214,9 +214,8 @@ class completion_activities_service
      */
     private function set_opennewtab_for_scorm(activity_details $activitiesdetails, \cm_info $coursemodule): void
     {
-        $scorm = $this->accmrepository->get_scorm_by_coursemoduleid($coursemodule->id);
-        if (!empty($scorm) && $scorm->popup == 0) {
-            $activitiesdetails->set_opennewtab($scorm->popup == 1);
+        if ($scorm = $this->accmrepository->get_scorm_by_coursemoduleid($coursemodule->id)) {
+            $activitiesdetails->set_opennewtab($scorm->popup);
         }
     }
 

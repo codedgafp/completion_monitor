@@ -51,7 +51,7 @@ class activity_details
 
     private ?string $status = null;
 
-    private bool $opennewtab = true;
+    private bool $opennewtab = false;
 
     public function __construct(\cm_info $cm, \completion_info $completioninfo = null)
     {
