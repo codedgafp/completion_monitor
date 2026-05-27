@@ -1,0 +1,7 @@
+services:
+  amd-minify:
+    image: node:20-slim
+    working_dir: /plugin
+    volumes:
+      - ./:/plugin
+    command: sh ./scripts/minify-amd.sh
