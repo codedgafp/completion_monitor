@@ -66,12 +66,12 @@ class activity_details
         $this->name = format_string($cm->name);
         $this->expected = $cm->completionexpected;
         $this->section = $cm->sectionnum;
-        $this->url = !is_null($cm->url) && method_exists($cm->url, 'out') ? $cm->url->out() : '';
         $this->context = $cm->context;
         $this->icon = $cm->get_icon_url();
         $this->available = $cm->available;
         $this->completionconditions = json_encode($this->get_activity_completion_conditions($cm, $completioninfo));
         $this->status = $this->get_completion_state_by_activity_id($course, $cm);
+        $this->url = $this->showurl($cm);
     }
 
     public function buildrecord(): array
@@ -254,5 +254,26 @@ class activity_details
         }
 
         return $completionstate;
+    }
+
+    private function showurl($cm): string
+    {
+        global $USER;
+
+        $isurlexist = is_null($cm->url);
+        if ($isurlexist) {
+            return '';
+        }
+
+        $coursecontext = \context_course::instance($cm->course);
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
+
+        $isurloutmethodexists = method_exists($cm->url, 'out');
+
+        if (!$isurloutmethodexists || $this->status === self::LOCKED && !$canviewhiddenactivities) {
+            return '';
+        }
+
+        return $cm->url->out();
     }
 }

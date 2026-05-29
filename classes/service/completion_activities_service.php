@@ -154,17 +154,13 @@ class completion_activities_service
             }
 
             $hasnocompletion = $cm->completion === COMPLETION_TRACKING_NONE;
-            $isnotvisible = $cm->get_user_visible();
+            $isvisible = $cm->visible;
 
-            if ($hasnocompletion || !$isnotvisible) {
-                if (isset($cm->availability) && $available) {
-                    $activities[] = $this->build_activity_details($cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
-                }
-
+            if ($hasnocompletion || !$canviewhiddenactivities && (!$available || !$isvisible))
                 continue;
-            }
 
-            if (!$canviewhiddenactivities && !$available) {
+            if (isset($cm->availability) && $available) {
+                $activities[] = $this->build_activity_details($cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
                 continue;
             }
 
