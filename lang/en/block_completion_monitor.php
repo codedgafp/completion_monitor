@@ -16,7 +16,6 @@
 
 $string['pluginname'] = 'Activities Completion Course Monitoring';
 $string['blocktitle'] = 'Activity monitoring';
-$string['activities_completion_course_monitoring:addinstance'] = 'Allow adding the Activities Completion Course Monitoring block';
 
 $string['viewreport'] = 'View tracking data';
 $string['showmore'] = 'Show more';

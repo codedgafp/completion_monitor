@@ -16,7 +16,6 @@
 
 $string['pluginname'] = 'Suivi des d\'achèvement des activités du cours';
 $string['blocktitle'] = 'Suivi des activités';
-$string['activities_completion_course_monitoring:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des activités et de la complétion du cours';
 
 $string['viewreport'] = 'Voir toutes les données de suivi';
 $string['showmore'] = 'Voir plus';
@@ -26,7 +25,7 @@ $string['courseprogress_percentage'] = 'Cours complété à {$a}%';
 $string['courseprogress_step'] = '{$a->activitiescompleted} sur {$a->activitiestocompleted} activités requises terminées';
 
 $string['region-top-block'] = 'Zone supérieure du cours';
-$string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités du cours';
+$string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités de la formation';
 
 
 // Progress bar strings.
