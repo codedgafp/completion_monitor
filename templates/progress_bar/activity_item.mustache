@@ -11,6 +11,7 @@
       - status        {string}  'completed' | 'inprogress' | 'not_started' | 'locked'
       - opennewtab    {bool}    true = open in new tab, false = open in same tab
       - completionconditions {string}  JSON encoded array of completion conditions
+      - issectionurl  {bool}    true if the url is a section url, false otherwise
 }}
 <li
     role="button"
@@ -23,6 +24,7 @@
     data-type="{{type}}"
     data-icon="{{icon}}"
     data-url="{{url}}"
+    data-issectionurl="{{issectionurl}}"
     data-opennewtab="{{opennewtab}}"
     data-status="{{status}}"
     data-required="{{#required}}1{{/required}}{{^required}}0{{/required}}"

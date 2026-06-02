@@ -58,3 +58,5 @@ $string['locked']      = 'accès restreint';
 $string['legend'] = 'Légende';
 $string['show_legend'] = 'Afficher la légende';
 $string['hide_legend'] = 'Masquer la légende';
+
+$string['viewsection'] = 'Aller à la section';

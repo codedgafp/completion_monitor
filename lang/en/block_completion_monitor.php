@@ -58,3 +58,5 @@ $string['locked']      = 'locked';
 $string['legend'] = 'Legend';
 $string['show_legend'] = 'Show legend';
 $string['hide_legend'] = 'Hide legend';
+
+$string['viewsection'] = 'View section';

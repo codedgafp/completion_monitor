@@ -53,6 +53,8 @@ class activity_details
 
     private bool $opennewtab = false;
 
+    private bool $issectionurl = false;
+
     public function __construct(\cm_info $cm, \completion_info $completioninfo = null)
     {
         $course = get_course($cm->course);
@@ -72,6 +74,7 @@ class activity_details
         $this->completionconditions = json_encode($this->get_activity_completion_conditions($cm, $completioninfo));
         $this->status = $this->get_completion_state_by_activity_id($course, $cm);
         $this->url = $this->showurl($cm);
+        $this->issectionurl = $this->is_section_url();
     }
 
     public function buildrecord(): array
@@ -93,6 +96,7 @@ class activity_details
             "status"                => $this->status,
             "completionconditions"  => $this->completionconditions,
             "opennewtab"            => $this->opennewtab,
+            "issectionurl"          => $this->issectionurl
         ];
     }
 
@@ -261,19 +265,32 @@ class activity_details
         global $USER;
 
         $isurlexist = is_null($cm->url);
-        if ($isurlexist) {
-            return '';
+        if (!$isurlexist) {
+
+            $coursecontext = \context_course::instance($cm->course);
+            $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
+
+            $isurloutmethodexists = method_exists($cm->url, 'out');
+
+            if (!$isurloutmethodexists || $this->status === self::LOCKED && !$canviewhiddenactivities) {
+                return '';
+            }
+
+            return $cm->url->out();
         }
 
-        $coursecontext = \context_course::instance($cm->course);
-        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
 
-        $isurloutmethodexists = method_exists($cm->url, 'out');
-
-        if (!$isurloutmethodexists || $this->status === self::LOCKED && !$canviewhiddenactivities) {
-            return '';
+        if ($isurlexist && $cm->modname === 'label') {
+            if (!empty($cm->section)) {
+                return (new \moodle_url('/course/section.php', [
+                    'id' => $cm->section
+                ]))->out(false);
+            }
         }
+    }
 
-        return $cm->url->out();
+    private function is_section_url(): bool
+    {
+        return $this->url && strpos($this->url, '/course/section.php') !== false;
     }
 }

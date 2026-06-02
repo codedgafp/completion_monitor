@@ -8,6 +8,7 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
             this.$el = $el;
             this.status = $el.data('status');
             this.required = $el.data('required') === 1;
+            this.issectionurl = $el.data('issectionurl') == 1;
             this._init();
         }
 
@@ -61,6 +62,7 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
                     name: this.$el.data('name'),
                     type: this.$el.data('type'),
                     url: this.$el.data('url'),
+                    issectionurl: this.issectionurl,
                     opennewtab: this.$el.data('opennewtab') === 1,
                     icon: this.$el.data('icon'),
                     status: this.status,

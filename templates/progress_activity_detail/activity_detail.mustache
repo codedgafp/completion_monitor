@@ -18,7 +18,13 @@
         </span>
         {{#url}}
         <a href="{{url}}" class="progressbar_detail-link">
-            {{#str}} viewactivity, block_completion_monitor {{/str}} 
+            {{#issectionurl}}
+                {{#str}} viewsection, block_completion_monitor {{/str}}
+            {{/issectionurl}}
+
+            {{^issectionurl}}
+                {{#str}} viewactivity, block_completion_monitor {{/str}}
+            {{/issectionurl}}
             <i class="fa fa-arrow-right" aria-hidden="true"></i>
         </a>
         {{/url}}

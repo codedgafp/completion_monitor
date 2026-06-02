@@ -45,6 +45,7 @@ define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core
                 name: vm.name,
                 type: vm.type,
                 url: vm.url,
+                issectionurl: vm.issectionurl,
                 opennewtab: vm.opennewtab,
                 status: vm.status,
                 is_required: vm.required,
@@ -55,7 +56,6 @@ define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core
                     ? JSON.parse(vm.completionconditions || '[]')
                     : (vm.completionconditions || []),
             };
-
             this.$container.html(
                 await Templates.render(
                     'block_completion_monitor/progress_activity_detail/activity_detail',
