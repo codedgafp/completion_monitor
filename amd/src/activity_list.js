@@ -1,21 +1,33 @@
-define(['jquery', 'block_completion_monitor/activity_item'], function ($, ActivityItem) {
+define([
+    'jquery',
+    'block_completion_monitor/activity_item'
+], function ($, ActivityItem) {
     'use strict';
 
     class ActivityList {
-
-        $el;
-        items = new Map();
-
-        constructor($el) {
+        constructor($el, $courseid, $userid) {
             this.$el = $el;
             this.items = new Map();
+
+            this.courseid = $courseid;
+            this.userid = $userid;
+
             this._init();
+
+            this.activityToDisplay = this.getLastActivityDetail(); 
         }
 
         _init() {
             let $items = this.$el.find('.progressbar-item');
+            this.itemToDisplay = null;
+
             $items.each((index, el) => {
                 const $el = $(el);
+
+                if (this.itemToDisplay === null) {
+                    this.itemToDisplay = $el;
+                }
+
                 const id = $el.data('id');
                 this.items.set(id, new ActivityItem($el));
 
@@ -66,6 +78,20 @@ define(['jquery', 'block_completion_monitor/activity_item'], function ($, Activi
         updateItem(activityId, updateDataList) {
             const item = this.items.get(activityId);
             item?.update(updateDataList);
+        }
+
+        /**
+         * Get the last activity detail the user oppened.
+         * If is null, get the first activity from the progress bar. 
+         */
+        getLastActivityDetail() {
+            let itemToDisplayId = sessionStorage.getItem('block_completion_monitor_' + this.userid + '_' + this.courseid + '_activity_detail_openned');
+
+            if (itemToDisplayId !== null) {
+                return this.items.get(parseInt(itemToDisplayId)).$el;
+            }
+
+            return this.itemToDisplay;
         }
 
         /**

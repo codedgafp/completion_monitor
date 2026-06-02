@@ -6,7 +6,7 @@ define([
 
     class ProgressBar {
 
-        constructor($el, activities) {
+        constructor($el, $courseid, $userid) {
             this.$el = $el;
             this.$list = $el.find('.progressbar_list');
             this.$arrowLeft = $el.find('[data-action="scroll-left"]');
@@ -14,7 +14,8 @@ define([
             this.$liveRegion = $el.find('[role="status"]');
             this.activityList = new ActivityList(
                 $el.find('.progressbar_list'),
-                activities
+                $courseid,
+                $userid
             );
 
             this._handleMobileOrder();

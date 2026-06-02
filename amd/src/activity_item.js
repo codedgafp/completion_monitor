@@ -70,7 +70,6 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
                     completionconditions: this.completionconditions,
                     el: this.$el,
                 }]);
-
             });
 
             this.$el.on('keydown', (e) => {

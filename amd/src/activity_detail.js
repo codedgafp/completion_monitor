@@ -1,12 +1,18 @@
-define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core/str'], function (Utils, Templates, Str) {
+define([
+    'block_completion_monitor/utils/activity_utils',
+    'core/templates',
+    'core/str'
+], function (Utils, Templates, Str) {
     'use strict';
     const { getColorClass, COMPONENT, ICON_MAP } = Utils;
 
     class ActivityDetail {
 
-        constructor($container) {
+        constructor($container, $courseid, $userid) {
             this.$container = $container;
             this.activity = null;
+            this.courseid = $courseid;
+            this.userid = $userid;
         }
 
         /**
@@ -39,7 +45,6 @@ define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core
             );
         }
 
-
         async _render(vm) {
             const context = {
                 name: vm.name,
@@ -69,6 +74,8 @@ define(['block_completion_monitor/utils/activity_utils', 'core/templates', 'core
                 this.$container.find('.progressbar_detail-link').attr('target', '_blank');
 
             this._notifyItem(this.activity, true);
+
+            sessionStorage.setItem('block_completion_monitor_' + this.userid + '_' + this.courseid + '_activity_detail_openned', this.activity.id);
         }
 
         _notifyItem(id, isOpen) {

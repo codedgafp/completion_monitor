@@ -41,7 +41,7 @@ class block_completion_monitor extends block_base
             'showless',
         ], 'block_completion_monitor');
 
-        $this->page->requires->js_call_amd('block_completion_monitor/block_completion_monitor', 'init', ['courseid' => $this->page->course->id]);
+        $this->page->requires->js_call_amd('block_completion_monitor/block_completion_monitor', 'init', ['courseid' => $this->page->course->id, 'userid' => $USER->id]);
         $this->page->requires->js_call_amd('block_completion_monitor/completion_monitor_dynamic', 'init', ['userid' => $USER->id, 'courseid' => $this->page->course->id]);
     }
 

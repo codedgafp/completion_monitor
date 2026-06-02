@@ -10,8 +10,9 @@ define([
         /**
          * Init JS
          */
-        init: function (courseid) {
+        init: function (courseid, userid) {
             this.courseid = courseid;
+            this.userid = userid;
             let that = this;
 
             $(document).ready(function () {
@@ -78,14 +79,41 @@ define([
 
             if (!$wrapper.length) return;
 
-            this.progressBar = new ProgressBar($wrapper);
+            this.progressBar = new ProgressBar($wrapper, this.courseid, this.userid);
+
             this.activityDetail = new ActivityDetail(
-                $('.block_completion_monitor .progressbar_detail-container')
+                $('.block_completion_monitor .progressbar_detail-container'),
+                this.courseid,
+                this.userid
             );
+
+            let activityToDisplay = this.progressBar.activityList.activityToDisplay;
+            if (activityToDisplay !== null && activityToDisplay.length > 0) {
+                let $activity = $(activityToDisplay[0]);
+                this.toggleDefaultActivity($activity, activityToDisplay);
+            }
 
             $wrapper.on('progressbar:activity:selected', (e, vm) => {
                 this.activityDetail.toggle(vm);
             });
+        },
+
+        toggleDefaultActivity: function($activity, activityToDisplay) {
+            let activityToToggle = {
+                id: $activity.data("id"),
+                name: $activity.data("name"),
+                type: $activity.data("type"),
+                url: $activity.data("url"),
+                issectionurl: $activity.data('issectionurl') == 1,
+                opennewtab: $activity.data("opennewtab") == 1,
+                icon: $activity.data("icon"),
+                status: $activity.data("status"),
+                required: $activity.data("required") == 1,
+                completionconditions: JSON.parse($activity.attr('data-conditions') || '[]'),
+                el: activityToDisplay,
+            };
+
+            this.activityDetail.toggle(activityToToggle);
         },
 
         initLegend: function () {
