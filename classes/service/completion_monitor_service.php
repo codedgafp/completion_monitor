@@ -95,14 +95,6 @@ class completion_monitor_service
     }
 
     /**
-     * @return string
-     */
-    public function block_completion_monitor_opened_preference_name(): string
-    {
-        return "block_completion_monitor_" . $this->course->id . "_opened";
-    }
-
-    /**
      * @param int $userid
      * @param int $cmid
      * @return bool

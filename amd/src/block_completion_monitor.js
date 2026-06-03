@@ -43,14 +43,6 @@ define([
                 ? this.showMore(block, openButton)
                 : this.showLess(block, openButton);
         },
-        /**
-         * Set user preference
-         *
-         * @param value
-         */
-        setBlockOpenedPreference: function (value) {
-            UserRepository.setUserPreference('block_completion_monitor_' + this.courseid + "_opened", value);
-        },
 
         showLess: function (block, openButton) {
             block.classList.add('hidden-block');
@@ -67,11 +59,9 @@ define([
 
         openCollapse: function(block, openButton) {
             this.showMore(block, openButton);
-            this.setBlockOpenedPreference(1);
         },
         closeCollapse: function(block, openButton) {
             this.showLess(block, openButton);
-            this.setBlockOpenedPreference(0);
         },
 
         initProgressBar: function () {
