@@ -150,7 +150,9 @@ class completion_activities_service
 
             if (isset($cm->availability)) {
                 $availability = json_decode($cm->availability);
-                $available = (bool) array_values($availability->showc)[0];
+                $available = $availability->op == '&'
+                    ? !in_array(false, $availability->showc)
+                    : $availability->show;
             }
 
             $hasnocompletion = $cm->completion === COMPLETION_TRACKING_NONE;
