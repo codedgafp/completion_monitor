@@ -188,31 +188,51 @@
         .card-body {
             padding: 0 !important;
 
-            .completion_monitor-custom-header {
-                .main-content {
-                    max-width: 228px;
+            div.block-completion-monitor {
+                width: 100%;
+                max-width: 316px;
+                margin: auto;
 
-                    .course-progress-percentage {
-                        font-size: 15px;
+                .completion_monitor-custom-header {
+                    .main-content {
+                        width: 100%;
+
+                        .course-progress-percentage {
+                            font-size: 15px;
+                        }
+
+                        .course-progress-step {
+                            font-size: 12px;
+                        }
+
+                        .completion-monitor-progress-details {
+                            display: none !important;
+                        }
+
+                        .block-progress-informations {
+                            #completion-monitor-circle-progress {
+                                width: 60px;
+                            }
+                        }
                     }
-                    .course-progress-step {
-                        font-size: 12px;
+
+                    .open-block {
+                        button {
+                            font-size: 12px;
+                        }
                     }
+
+                    .button-showless-showmore {
+                        #showless-showmore-text {
+                            display: none;
+                        }
+                    }
+                }
+
+                .completion_monitor-content {
                     .completion-monitor-progress-details {
-                        display: none !important;
+                        display: block !important;
                     }
-                }
-
-                .open-block {
-                    button {
-                        font-size: 12px;
-                    }
-                }
-            }
-
-            .completion_monitor-content {
-                .completion-monitor-progress-details {
-                    display: block !important;
                 }
             }
         }

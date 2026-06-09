@@ -113,8 +113,9 @@ define([
             const $bottomRow = this.$el.find('.progressbar_bottom-row');
             const $legend = this.$el.find('.progressbar_legend-container');
             const $detail = this.$el.find('.progressbar_detail-container');
+            const $sidecompletionblock = $('#block-region-side-pre .card-body section.block_completion_monitor');
 
-            if ($(window).width() < 768) {
+            if ($(window).width() < 768 || $sidecompletionblock.length > 0) {
                 $bottomRow.prepend($legend);
             } else {
                 $bottomRow.append($legend);

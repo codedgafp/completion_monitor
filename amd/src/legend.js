@@ -18,7 +18,7 @@ define([
 
         _bindEvents() {
             this.$toggle.on('click', (e) => {
-                if (this._isMobile()) {
+                if (this._isMobileOrSide()) {
                     this._openModal();
                 } else {
                     this._toggleDesktop();
@@ -30,8 +30,10 @@ define([
             });
         }
 
-        _isMobile() {
-            return $(window).width() < 768;
+        _isMobileOrSide() {
+            const $sidecompletionblock = $('#block-region-side-pre .card-body section.block_completion_monitor');
+
+            return $(window).width() < 768 || $sidecompletionblock.length > 0;
         }
 
         _toggleDesktop() {
