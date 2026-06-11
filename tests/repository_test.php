@@ -149,7 +149,7 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         $this->grade_student($student, $assign, $teacher, 75, 0);
 
         // User has assign submission.
-        $usersubmissions = local_mentor_core_completion_get_user_course_submissions($course->id, $student->id);
+        $usersubmissions = $this->repository->get_user_course_submissions($course->id, $student->id);
         self::assertCount(1, $usersubmissions);
 
         self::resetAllData();

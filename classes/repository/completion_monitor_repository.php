@@ -72,11 +72,13 @@ class completion_monitor_repository
         $submissionsvalues = [];
         $submissionslist = [];
 
-        $submissionsvalues = [...$this->get_assign_individual_submission($courseid, $userid)];
-        $submissionsvalues = [...$this->get_assign_group_submission($courseid, $userid)];
-        $submissionsvalues = [...$this->get_workshop_submission($courseid, $userid)];
-        $submissionsvalues = [...$this->get_quiz_attempts($courseid, $userid)];
-        $submissionsvalues = [...$this->get_quiz_attempts_grading_methods($courseid, $userid)];
+        $submissionsvalues = [
+            ...$this->get_assign_individual_submission($courseid, $userid),
+            ...$this->get_assign_group_submission($courseid, $userid),
+            ...$this->get_workshop_submission($courseid, $userid),
+            ...$this->get_quiz_attempts($courseid, $userid),
+            ...$this->get_quiz_attempts_grading_methods($courseid, $userid),
+        ];
 
         foreach ($submissionsvalues as $id => $obj) {
             $submissionslist[$id] = $obj;

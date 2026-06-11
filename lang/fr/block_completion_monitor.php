@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['pluginname'] = 'Suivi des d\'achèvement des activités du cours';
+$string['pluginname'] = 'Suivi d\'achèvement des activités du cours';
 $string['blocktitle'] = 'Suivi des activités';
 
 $string['viewreport'] = 'Voir toutes les données de suivi';
