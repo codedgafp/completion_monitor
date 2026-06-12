@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'block_completion_monitor/activity_item'
-], function ($, ActivityItem) {
+    'block_completion_monitor/activity_item',
+    'block_completion_monitor/tooltip',
+], function ($, ActivityItem, Tooltip) {
     'use strict';
 
     class ActivityList {
@@ -14,7 +15,7 @@ define([
 
             this._init();
 
-            this.activityToDisplay = this.getLastActivityDetail(); 
+            this.activityToDisplay = this.getLastActivityDetail();
         }
 
         _init() {
@@ -63,10 +64,12 @@ define([
             this.$el.on('keydown', '.progressbar-item', (e) => {
                 this._showArrows(e);
             });
-            
+
             this.$el.on('scroll', '.progressbar-item', (e) => {
                 this._showArrows(e);
             });
+
+            Tooltip.getInstance().attachTo(this.$el);
         }
 
         /**
@@ -82,7 +85,7 @@ define([
 
         /**
          * Get the last activity detail the user oppened.
-         * If is null, get the first activity from the progress bar. 
+         * If is null, get the first activity from the progress bar.
          */
         getLastActivityDetail() {
             let itemToDisplayId = sessionStorage.getItem('block_completion_monitor_' + this.userid + '_' + this.courseid + '_activity_detail_openned');
@@ -96,7 +99,7 @@ define([
 
         /**
          * Return items count.
-         * 
+         *
          * @return {number}
          */
         get count() {

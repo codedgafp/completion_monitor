@@ -14,13 +14,15 @@
     transition: opacity 0.15s, transform 0.1s;
 
     &:hover {
-        opacity: 0.85;
+        outline: 2px solid rgba(@progress-main-blue-color, 0.5) !important;
+        outline-offset: 3px !important;
     }
 
     &:focus-visible,
     &:focus {
-        box-shadow: none !important; 
-        outline-color: rgba(@progress-main-blue-color, 0.5) !important;
+        box-shadow: none !important;
+        outline: 2px solid rgba(@progress-main-blue-color, 0.5) !important;
+        outline-offset: 3px !important;
     }
 
     &[aria-current="true"] {

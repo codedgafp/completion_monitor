@@ -8,11 +8,21 @@ define([
 
     class ActivityDetail {
 
-        constructor($container, $courseid, $userid) {
+        /**
+     * @param {jQuery}  $container
+     * @param {number}  $courseid
+     * @param {number}  $userid
+     * @param {Object}  [options]
+     * @param {boolean} [options.closeOnReselect=false]  If true, clicking the
+     *   already-open item closes the panel (toggle behaviour). If false, the
+     *   panel always stays open.
+     */
+        constructor($container, $courseid, $userid, { closeOnReselect = false } = {}) {
             this.$container = $container;
             this.activity = null;
             this.courseid = $courseid;
             this.userid = $userid;
+            this.closeOnReselect = closeOnReselect;
         }
 
         /**
@@ -72,6 +82,7 @@ define([
 
             if(vm.opennewtab) 
                 this.$container.find('.progressbar_detail-link').attr('target', '_blank');
+                this.$container.find('.progressbar_detail-link').attr('tabindex', '0');
 
             this._notifyItem(this.activity, true);
 
@@ -90,7 +101,9 @@ define([
          */
         toggle(vm) {
             if (this.activity?.id === vm.id) {
-                this.close();
+                if (this.closeOnReselect) {
+                    this.close();
+                }
                 return;
             }
 

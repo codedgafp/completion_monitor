@@ -1,0 +1,62 @@
+.progressbar_tooltip {
+    --arrow-x: 0px;
+
+    position: fixed;
+    z-index: 1100;
+    max-width: 280px;
+    padding: 0.25rem 0.75rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: #3a3a3a;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        left: ~"calc(50% + var(--arrow-x))";
+        transform: translateX(-50%);
+        border-style: solid;
+        border-left-color: transparent;
+        border-right-color: transparent;
+        border-bottom: none;
+    }
+
+    &::before {
+        bottom: -7px;
+        border-width: 6px 6px 0;
+        border-top-color: rgba(0, 0, 0, 0.1);
+    }
+
+    &::after {
+        bottom: -5px;
+        border-width: 5px 5px 0;
+        border-top-color: #fff;
+    }
+
+    @media (-ms-high-contrast: active), (forced-colors: active) {
+        outline: 1px solid;
+        background: canvas;
+    }
+
+    @media print {
+        display: none;
+    }
+
+    &-label {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &--visible {
+        opacity: 1;
+    }
+}
