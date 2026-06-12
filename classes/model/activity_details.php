@@ -264,9 +264,17 @@ class activity_details
     {
         global $USER;
 
-        $isurlexist = is_null($cm->url);
-        if (!$isurlexist) {
+        $urlisnull = is_null($cm->url);
 
+        if ($urlisnull) {
+            if ($cm->modname === 'label' && !empty($cm->section)) {
+                return (new \moodle_url('/course/section.php', [
+                    'id' => $cm->section
+                ]))->out(false);
+            }
+
+            return '';
+        } else {
             $coursecontext = \context_course::instance($cm->course);
             $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
 
@@ -277,15 +285,6 @@ class activity_details
             }
 
             return $cm->url->out();
-        }
-
-
-        if ($isurlexist && $cm->modname === 'label') {
-            if (!empty($cm->section)) {
-                return (new \moodle_url('/course/section.php', [
-                    'id' => $cm->section
-                ]))->out(false);
-            }
         }
     }
 
