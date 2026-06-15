@@ -93,7 +93,9 @@ class completion_activities_service
 
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
 
-        foreach ($activities as /** @var activity_details */ $activity) {
+        foreach ($activities as
+        /** @var activity_details */
+        $activity) {
             $coursemodule = $modinfo->cms[$activity->get_id()];
 
             if (!$coursemodule->visible && !$canviewhiddenactivities) {
@@ -178,8 +180,7 @@ class completion_activities_service
         array   $coursecompletioncriterialist,
         array   $coursecompletionactivities,
         array   $sections
-    ): activity_details
-    {
+    ): activity_details {
         $module = $cm->modname;
         $required = $this->is_activity_required(
             $coursecompletioncriterialist,
@@ -193,12 +194,6 @@ class completion_activities_service
         $activitydetails->set_modulename($cm->get_module_type_name());
         $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));
         $activitydetails->set_required($required);
-
-        // Due to the Patch Edunao mentor: display scorm in a new tab or not.
-        if ($module === 'scorm') {
-            $this->set_opennewtab_for_scorm($activitydetails, $cm);
-        }
-
         return $activitydetails;
     }
 
@@ -227,19 +222,7 @@ class completion_activities_service
         return false;
     }
 
-    /**
-     * If the scorm activity allow popup, then update the activity_details given object
-     * 
-     * @param activity_details $activitiesdetails
-     * @param \cm_info $coursemodule
-     * @return void
-     */
-    private function set_opennewtab_for_scorm(activity_details $activitiesdetails, \cm_info $coursemodule): void
-    {
-        if ($scorm = $this->accmrepository->get_scorm_by_coursemoduleid($coursemodule->id)) {
-            $activitiesdetails->set_opennewtab($scorm->popup);
-        }
-    }
+
 
     /**
      * @return bool
@@ -253,5 +236,24 @@ class completion_activities_service
 
         $activities = $this->get_filtered_activities($USER->id, $exclusions);
         return !empty($activities);
+    }
+
+    /**
+     * Summary of set_opennewtab_for_scorm
+     * Due to the Patch Edunao mentor: display scorm in a new tab or not.
+     * @param cm_info $cm
+     * @return bool
+     */
+    public function set_opennewtab_for_scorm(\cm_info $cm): bool
+    {
+        if ($cm->modname !== 'scorm') {
+            return false;
+        }
+
+        if ($scorm =  $this->accmrepository->get_scorm_by_coursemoduleid($cm->id)) {
+            return $scorm->popup == '1' ;
+        }
+
+        return false;
     }
 }

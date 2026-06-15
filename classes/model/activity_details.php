@@ -3,6 +3,7 @@
 namespace block_completion_monitor\model;
 
 use block_completion_monitor\helper\progress;
+use block_completion_monitor\service\completion_activities_service;
 use block_completion_monitor\service\completion_monitor_service;
 use block_completion_monitor\repository\completion_monitor_repository;
 use core_completion\cm_completion_details;
@@ -59,6 +60,8 @@ class activity_details
     {
         $course = get_course($cm->course);
 
+        $service = new completion_activities_service($course);
+
         if ($completioninfo == null) {
             $completioninfo = new \completion_info($course);
         }
@@ -73,12 +76,14 @@ class activity_details
         $this->available = $cm->available;
         $this->completionconditions = json_encode($this->get_activity_completion_conditions($cm, $completioninfo));
         $this->status = $this->get_completion_state_by_activity_id($course, $cm);
+        $this->opennewtab = $service->set_opennewtab_for_scorm($cm);
         $this->url = $this->showurl($cm);
         $this->issectionurl = $this->is_section_url();
+    
     }
 
     public function buildrecord(): array
-    {
+    { 
         return [
             "id"                    => $this->id,
             "type"                  => $this->type,
@@ -151,15 +156,14 @@ class activity_details
     {
         return $this->completionconditions;
     }
-
+    
+    public function get_opennewtab(): bool
+    {
+        return $this->opennewtab;
+    }
     public function set_opennewtab(bool $opennewtab): void
     {
         $this->opennewtab = $opennewtab;
-    }
-
-    public function get_opennewtab(): ?bool
-    {
-        return $this->opennewtab;
     }
 
     /**
@@ -262,10 +266,13 @@ class activity_details
 
     private function showurl($cm): string
     {
-        global $USER;
+        global $USER;   
 
+        if ($cm->modname === 'scorm' && $this->opennewtab) {
+            $url = new \moodle_url('/local/mentor_core/pages/scorm.php', ['cmid' => $cm->id]);
+            return $url->out(false);
+        }    
         $urlisnull = is_null($cm->url);
-
         if ($urlisnull) {
             if ($cm->modname === 'label' && !empty($cm->section)) {
                 return (new \moodle_url('/course/section.php', [
