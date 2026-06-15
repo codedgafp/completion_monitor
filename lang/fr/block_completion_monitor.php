@@ -25,7 +25,7 @@ $string['courseprogress_percentage'] = 'Cours complété à {$a}%';
 $string['courseprogress_step'] = '{$a->activitiescompleted} sur {$a->activitiestocompleted} activités requises terminées';
 
 $string['region-top-block'] = 'Zone supérieure du cours';
-$string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités de la formation';
+$string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités du cours';
 
 
 // Progress bar strings.
