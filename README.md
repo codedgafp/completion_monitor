@@ -10,3 +10,7 @@ minification :
 ```
 docker compose run --rm amd-minify
 ```
+
+## Troubleshoot
+
+En cas d'erreur avec <UNABLE_TO_GET_ISSUER_CERT_LOCALLY>, changer l'image docker.

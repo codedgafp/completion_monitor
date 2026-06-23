@@ -47,11 +47,15 @@ define([
         showLess: function (block, openButton) {
             block.classList.add('hidden-block');
 
+            this.progressBar._updateArrows();
+
             Templates.renderForPromise('block_completion_monitor/progress_header/show_more_button')
             .then( ({html}) => openButton.html(html) );
         },
         showMore: function (block, openButton) {
             block.classList.remove('hidden-block');
+
+            this.progressBar._updateArrows();
 
             Templates.renderForPromise('block_completion_monitor/progress_header/show_less_button')
             .then( ({html}) => openButton.html(html) );
