@@ -62,6 +62,24 @@ define([
             });
 
             this.$el.on('keydown', '.progressbar-item', (e) => {
+
+                if (e.key === 'Tab' && !e.shiftKey) {
+
+                    const $item = $(e.currentTarget);
+                    const isActive = $item.attr('aria-current') === 'true';
+
+                    if (isActive) {
+                        const $detail = $('#progressbar_detail');
+                        const $link = $detail.find('.progressbar_detail-link');
+
+                        if ($link.length) {
+                            e.preventDefault();
+                            $link.trigger('focus');
+                            return;
+                        }
+                    }
+                }
+
                 this._showArrows(e);
             });
 

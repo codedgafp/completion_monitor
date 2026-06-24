@@ -84,11 +84,32 @@ define([
                 this.$container.find('.progressbar_detail-link').attr('target', '_blank');
                 this.$container.find('.progressbar_detail-link').attr('tabindex', '0');
 
+            this._bindDetailTabTrap();
             this._notifyItem(this.activity, true);
 
             sessionStorage.setItem('block_completion_monitor_' + this.userid + '_' + this.courseid + '_activity_detail_openned', this.activity.id);
         }
 
+        _bindDetailTabTrap() {
+            const $link = this.$container.find('.progressbar_detail-link');
+            if (!$link.length) return;
+
+            $link.off('keydown.detailtab').on('keydown.detailtab', (e) => {
+                if (e.key !== 'Tab' || e.shiftKey) return;
+
+                const $currentItem = this.activity?.el;
+                if (!$currentItem) return;
+
+                const $allItems = $currentItem.closest('.progressbar_list').find('.progressbar-item');
+                const currentIndex = $allItems.index($currentItem);
+                const $nextItem = $allItems.eq(currentIndex + 1);
+
+                if ($nextItem.length) {
+                    e.preventDefault();
+                    $nextItem.trigger('focus');
+                }
+            });
+        }
         _notifyItem(id, isOpen) {
             this.activity?.el.trigger(isOpen ? 'progressbar:detail:opened' : 'progressbar:detail:closed', [id]);
         }
@@ -122,7 +143,7 @@ define([
 
         close() {
             this._notifyItem(this.activity, false);
-            this.$container.find('.progressbar_detail-link').removeAttr('target');
+            this.$container.find('.progressbar_detail-link').removeAttr('target').off('keydown.detailtab');
             this.activity = null;
             this.$container.empty();
         }
