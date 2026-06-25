@@ -71,16 +71,17 @@ define([
                     ? JSON.parse(vm.completionconditions || '[]')
                     : (vm.completionconditions || []),
             };
+
             this.$container.html(
                 await Templates.render(
                     'block_completion_monitor/progress_activity_detail/activity_detail',
                     context
                 )
             );
-        
+
             this._applyBadgeIcon();
 
-            if(vm.opennewtab) 
+            if (vm.opennewtab) 
                 this.$container.find('.progressbar_detail-link').attr('target', '_blank');
                 this.$container.find('.progressbar_detail-link').attr('tabindex', '0');
 

@@ -108,11 +108,13 @@ define([
         getLastActivityDetail() {
             let itemToDisplayId = sessionStorage.getItem('block_completion_monitor_' + this.userid + '_' + this.courseid + '_activity_detail_openned');
 
-            if (itemToDisplayId !== null) {
-                return this.items.get(parseInt(itemToDisplayId)).$el;
+            if (itemToDisplayId === null) {
+                return this.itemToDisplay;
             }
 
-            return this.itemToDisplay;
+            let getItemToDisplay = this.items.get(parseInt(itemToDisplayId));
+
+            return getItemToDisplay?.$el ?? this.itemToDisplay;
         }
 
         /**
