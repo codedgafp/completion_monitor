@@ -42,10 +42,9 @@ class completion_activities_service
      */
     public function get_course_completion_details(int $userid): array
     {
-        // Get gradebook exclusions list for students in a course.
-        $exclusions = $this->accmrepository->get_grade_exclusions($this->course->id, $userid);
-
-        $activities = $this->get_filtered_activities($userid, $exclusions, true);
+        $modinfo = get_fast_modinfo($this->course, $userid);
+        $activities = $this->get_activities_details($modinfo);
+        $activities = array_filter($activities, fn(activity_details $activity) => $activity->get_required() == true);
 
         $coursecompletionsdetails = [
             'percentage' => 0,
@@ -75,10 +74,9 @@ class completion_activities_service
      * Filters activities that a user cannot see due to grouping constraints
      *
      * @param int $userid
-     * @param bool $onlyrequired
      * @return activity_details[]
      */
-    public function get_filtered_activities(int $userid, array $exclusions, bool $onlyrequired = false): array
+    public function get_filtered_activities(int $userid, array $exclusions): array
     {
         global $CFG;
 
@@ -87,9 +85,6 @@ class completion_activities_service
         $modinfo = get_fast_modinfo($this->course, $userid);
 
         $activities = $this->get_activities_details($modinfo);
-        if ($onlyrequired) {
-            $activities = array_filter($activities, fn(activity_details $activity) => $activity->get_required() == true);
-        }
 
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
 
@@ -221,8 +216,6 @@ class completion_activities_service
 
         return false;
     }
-
-
 
     /**
      * @return bool
