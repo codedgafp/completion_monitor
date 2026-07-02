@@ -1,8 +1,9 @@
 define([
+    'jquery',
     'block_completion_monitor/utils/activity_utils',
     'core/templates',
     'core/str'
-], function (Utils, Templates, Str) {
+], function ($, Utils, Templates, Str) {
     'use strict';
     const { getColorClass, COMPONENT, ICON_MAP } = Utils;
 
