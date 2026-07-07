@@ -1,6 +1,6 @@
 <?php
 
-use block_completion_monitor\service\completion_activities_service;
+use block_completion_monitor\service\completion_monitor_service;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -49,8 +49,10 @@ class block_completion_monitor extends block_base
     {
         $this->content = new \stdClass();
         $this->content->text = '';
+
         // Check if the block should be displayed for the course.
-        $service = new completion_activities_service($this->page->course);
+        $service = new completion_monitor_service($this->page->course);
+
         if (!$service->should_display_block()) {
             return $this->content;
         }

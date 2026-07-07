@@ -18,10 +18,6 @@ $observers = [
         'callback'  => '\block_completion_monitor\observer::course_module_changed',
     ],
     [
-        'eventname' => '\core\event\course_module_deleted',
-        'callback'  => '\block_completion_monitor\observer::course_module_changed',
-    ],
-    [
         'eventname' => '\core\event\course_module_completion_updated',
         'callback'  => '\block_completion_monitor\observer::completion_updated',
     ],

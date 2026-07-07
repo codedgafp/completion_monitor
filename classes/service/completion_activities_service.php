@@ -3,6 +3,7 @@
 namespace block_completion_monitor\service;
 
 use cm_info;
+use context_course;
 use course_modinfo;
 use moodle_database;
 use block_completion_monitor\helper\progress;
@@ -14,7 +15,7 @@ class completion_activities_service
     use progress;
 
     /**
-     * Activities Completion Course Monitoring repository
+     * Activities Completion Course Monitor repository
      * @var completion_monitor_repository
      */
     protected completion_monitor_repository $accmrepository;
@@ -81,7 +82,7 @@ class completion_activities_service
         global $CFG;
 
         $filteredactivities = [];
-        $coursecontext = \context_course::instance($this->course->id);
+        $coursecontext = context_course::instance($this->course->id);
         $modinfo = get_fast_modinfo($this->course, $userid);
 
         $activities = $this->get_activities_details($modinfo);
@@ -138,7 +139,7 @@ class completion_activities_service
 
         $coursecompletioncriterialist = $this->db->get_records('course_completion_criteria', ['course' => $this->course->id]);
 
-        $coursecontext = \context_course::instance($this->course->id);
+        $coursecontext = context_course::instance($this->course->id);
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
 
         // Create activities list with completion set.
@@ -218,26 +219,12 @@ class completion_activities_service
     }
 
     /**
-     * @return bool
-     */
-    public function should_display_block(): bool
-    {
-        global $USER;
-
-        // Get gradebook exclusions list for students in a course.
-        $exclusions = $this->accmrepository->get_grade_exclusions($this->course->id, $USER->id);
-
-        $activities = $this->get_filtered_activities($USER->id, $exclusions);
-        return !empty($activities);
-    }
-
-    /**
      * Summary of set_opennewtab_for_scorm
      * Due to the Patch Edunao mentor: display scorm in a new tab or not.
      * @param cm_info $cm
      * @return bool
      */
-    public function set_opennewtab_for_scorm(\cm_info $cm): bool
+    public function set_opennewtab_for_scorm(cm_info $cm): bool
     {
         if ($cm->modname !== 'scorm') {
             return false;

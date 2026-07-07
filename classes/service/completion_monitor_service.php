@@ -2,7 +2,9 @@
 
 namespace block_completion_monitor\service;
 
+use context_course;
 use moodle_database;
+use core\context\course;
 use block_completion_monitor\helper\progress;
 use block_completion_monitor\model\block_instance_record;
 use block_completion_monitor\repository\completion_monitor_repository;
@@ -10,7 +12,7 @@ use block_completion_monitor\repository\completion_monitor_repository;
 require_once($CFG->libdir . '/completionlib.php');
 
 /**
- * Activities Completion Course Monitoring service.
+ * Activities Completion Course Monitor service.
  * 
  * @package     block_completion_monitor
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -20,10 +22,21 @@ class completion_monitor_service
     use progress;
 
     /**
-     * Activities Completion Course Monitoring repository
+     * @var bool|course
+     */
+    private bool|course $contextcourse;
+
+    /**
+     * Completion Course Monitor repository
      * @var completion_monitor_repository
      */
     protected completion_monitor_repository $accmrepository;
+
+    /**
+     * Activities Completion Course Monitor repository
+     * @var completion_activities_service
+     */
+    protected completion_activities_service $completionactivitiesservice;
 
     /**
      * Moodle Database
@@ -32,11 +45,13 @@ class completion_monitor_service
     protected moodle_database $db;
 
     public function __construct(
-        private \stdClass $course,
+        private \stdClass $course
     ) {
         global $DB;
 
+        $this->contextcourse = context_course::instance($this->course->id);
         $this->accmrepository = new completion_monitor_repository();
+        $this->completionactivitiesservice = new completion_activities_service($this->course);
         $this->db = $DB;
     }
 
@@ -53,14 +68,12 @@ class completion_monitor_service
      */
     public function add_block_to_course(): void
     {
-        $context = \context_course::instance($this->course->id);
-
-        $exists = $this->accmrepository->block_instance_exists($context->id);
+        $exists = $this->accmrepository->block_instance_exists($this->contextcourse->id);
 
         if (!$exists) {
             $blockRecord = new block_instance_record(
                 blockname: 'completion_monitor',
-                parentcontextid: $context->id,
+                parentcontextid: $this->contextcourse->id,
                 pagetypepattern: 'course-view-*'
             );
 
@@ -73,13 +86,12 @@ class completion_monitor_service
      */
     public function remove_block_from_course(): void
     {
-        $context = \context_course::instance($this->course->id);
-        $exists = $this->accmrepository->block_instance_exists($context->id);
+        $exists = $this->accmrepository->block_instance_exists($this->contextcourse->id);
 
         if ($exists) {
             $this->db->delete_records('block_instances', [
                 'blockname' => 'completion_monitor',
-                'parentcontextid' => $context->id
+                'parentcontextid' => $this->contextcourse->id
             ]);
         }
     }
@@ -103,5 +115,36 @@ class completion_monitor_service
     {
         $preferencename = $this->course_module_viewed_preference_name($userid, $cmid);
         return $this->db->record_exists('user_preferences', ['name' => $preferencename]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function should_display_block(): bool
+    {
+        global $USER;
+
+        $isusercourseadmin = $this->is_user_course_manager($USER->id);
+
+        if ($this->course->enablecompletion == COMPLETION_DISABLED) {
+            return $isusercourseadmin;
+        }
+
+        if ($isusercourseadmin) {
+            return true;
+        }
+
+        $exclusions = $this->accmrepository->get_grade_exclusions($this->course->id, $USER->id);
+        $activities = $this->completionactivitiesservice->get_filtered_activities($USER->id, $exclusions);
+
+        return !empty($activities); 
+    }
+
+    /**
+     * @param int $userid
+     */
+    public function is_user_course_manager(int $userid)
+    {
+        return has_capability('moodle/course:manageactivities', $this->contextcourse, $userid);
     }
 }

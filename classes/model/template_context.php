@@ -2,7 +2,7 @@
 
 namespace block_completion_monitor\model;
 
-use block_completion_monitor\service\completion_monitor_service;
+use completion_info;
 use block_completion_monitor\service\completion_activities_service;
 
 defined('MOODLE_INTERNAL') || die();
@@ -19,15 +19,17 @@ class template_context extends model_manager
 
     private ?array $activitiesdetails = null;
 
+    private ?string $blockadminmessage = null;
+
     public function __construct(\stdClass $course)
     {
-        global $USER;
-
         $completionactivitiesservice = new completion_activities_service($course);
 
         $activities = $completionactivitiesservice->get_activities_details();
 
-        $this->display_percentage = $this->display_percentage($activities);
+        $this->blockadminmessage = $this->get_progress_enabled_message($course);
+
+        $this->display_percentage = $this->blockadminmessage === null ? $this->display_percentage($activities) : false;
 
         if ($this->display_percentage) {
             $coursecompletiondetails = $this->course_completion_details($course);
@@ -49,6 +51,7 @@ class template_context extends model_manager
             'courseprogress_percentage' => $this->courseprogress_percentage,
             'courseprogress_step'       => $this->courseprogress_step,
             'activities_details'        => $this->activitiesdetails,
+            'block_admin_message'       => $this->blockadminmessage,
             'uniqid'                    => uniqid()
         ];
     }
@@ -78,5 +81,23 @@ class template_context extends model_manager
             'activitiescompleted' => count($completionscompleted),
             'activitiestocompleted' => count($completions)
         ];
+    }
+
+    /**
+     * @param \stdClass $course
+     * @return string|null
+     */
+    private function get_progress_enabled_message(\stdClass $course): string|null
+    {
+        if ($course->enablecompletion == COMPLETION_DISABLED) {
+            return get_string('course_progress_disabled', 'block_completion_monitor');
+        }
+
+        $coursecompletion = new completion_info($course);
+        if (empty($coursecompletion->get_activities())) {
+            return get_string('no_course_activities_progress', 'block_completion_monitor');
+        }
+
+        return null;
     }
 }

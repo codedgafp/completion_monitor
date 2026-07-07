@@ -20,19 +20,19 @@ class block_completion_monitor_service_testcase extends advanced_testcase
     private \stdClass $course;
 
     /**
-     * Activities Completion Course Monitoring repository
+     * Activities Completion Course Monitor repository
      * @var completion_monitor_repository
      */
     private completion_monitor_repository $repository;
 
     /**
-     * Completion Course Monitoring service
+     * Completion Course Monitor service
      * @var completion_monitor_service
      */
     private completion_monitor_service $completionmonitorservice;
 
     /**
-     * Activities Completion Course Monitoring service
+     * Activities Completion Course Monitor service
      * @var completion_activities_service
      */
     private completion_activities_service $completionactivitiesservice;
@@ -304,10 +304,12 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $activitydetails = current($activitiesdetails);
         self::assertNotNull($activitydetails);
         $completionconditions = json_decode($activitydetails->get_completionconditions(), true);
-        self::assertEquals([[
-            'status' => 0,
-            'description' => 'Mark complete'
-        ]], $completionconditions);
+        self::assertEquals([
+            [
+                'status' => 0,
+                'description' => 'Mark complete'
+            ]
+        ], $completionconditions);
         self::assertInstanceOf(activity_details::class, $activitydetails);
         self::assertEquals($instancecm->id, $activitydetails->get_id());
         self::assertEquals('quiz', $activitydetails->get_type());
@@ -331,11 +333,11 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $criteriadata = (object) [
             'id' => $this->course->id,
             'criteria_activity' => [
-            $instancecm->id => 1
+                $instancecm->id => 1
             ]
         ];
         $criterion = new completion_criteria_activity();
-        $criterion->update_config($criteriadata);   
+        $criterion->update_config($criteriadata);
 
         $activitiesdetails = $this->completionactivitiesservice->get_activities_details();
         $activitydetails = current($activitiesdetails);
@@ -361,38 +363,77 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         self::assertEquals($position, $DB->get_field('block_instances', 'defaultregion', ['parentcontextid' => $context->id]));
     }
 
-    public function test_should_display_block()
+    public function test_should_display_block_completion_disabled()
     {
-        global $USER;
+        $course = $this->getDataGenerator()->create_course([
+            'enablecompletion' => 0,
+        ]);
 
-        self::setAdminUser();
+        // Participant
+        $participant = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($participant);
 
-
-        $shoulddisplay = $this->completionactivitiesservice->should_display_block();
+        $shoulddisplay = $this->completionmonitorservice->should_display_block();
         self::assertFalse($shoulddisplay);
 
-        $record = new stdClass();
-        $record->course = $this->course;
-        $record->completion = 1;
-        $record->completionview = 1;
-        $record->completionexpected = 0;
-        $record->completionunlocked = 1;
-        $record->visible = 1;
-        $instance1 = $this->getDataGenerator()->create_module('url', $record);
-        $instance1cm = get_coursemodule_from_id('url', $instance1->cmid);
+        // Manager
+        $rolesmanageactivities = get_roles_with_capability('moodle/course:manageactivities', CAP_ALLOW, context_system::instance());
+        $rolemanageactivities = reset($rolesmanageactivities)->shortname;
 
-        // create course completion, and add the url activity as criteria
-        $criteriadata = (object) [
-            'id' => $this->course->id,
-            'criteria_activity' => [
-                $instance1cm->id => 1
-            ]
-        ];
-        $criterion = new completion_criteria_activity();
-        $criterion->update_config($criteriadata);
+        $manager = $this->getDataGenerator()->create_and_enrol($this->course, $rolemanageactivities);
+        $this->setUser($manager);
 
-        $shoulddisplay = $this->completionactivitiesservice->should_display_block();
+        $shoulddisplay = $this->completionmonitorservice->should_display_block();
         self::assertTrue($shoulddisplay);
     }
 
+    public function test_should_display_block_completion_enabled_no_completion_activities()
+    {
+        $record = new stdClass();
+        $record->course = $this->course;
+        $record->completion = 0;
+        $this->getDataGenerator()->create_module('forum', $record);
+
+        // Participant
+        $participant = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $this->setUser($participant);
+
+        $shoulddisplay = $this->completionmonitorservice->should_display_block();
+        self::assertFalse($shoulddisplay);
+
+        // Manager
+        $rolesmanageactivities = get_roles_with_capability('moodle/course:manageactivities', CAP_ALLOW, context_system::instance());
+        $rolemanageactivities = reset($rolesmanageactivities)->shortname;
+
+        $manager = $this->getDataGenerator()->create_and_enrol($this->course, $rolemanageactivities);
+        $this->setUser($manager);
+
+        $shoulddisplay = $this->completionmonitorservice->should_display_block();
+        self::assertTrue($shoulddisplay);
+    }
+
+    public function test_should_display_block_completion_enabled_and_completion_activities()
+    {
+        $record = new stdClass();
+        $record->course = $this->course;
+        $record->completion = 1;
+        $this->getDataGenerator()->create_module('forum', $record);
+
+        // Participant
+        $participant = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $this->setUser($participant);
+
+        $shoulddisplay = $this->completionmonitorservice->should_display_block();
+        self::assertTrue($shoulddisplay);
+
+        // Manager
+        $rolesmanageactivities = get_roles_with_capability('moodle/course:manageactivities', CAP_ALLOW, context_system::instance());
+        $rolemanageactivities = reset($rolesmanageactivities)->shortname;
+
+        $manager = $this->getDataGenerator()->create_and_enrol($this->course, $rolemanageactivities);
+        $this->setUser($manager);
+
+        $shoulddisplay = $this->completionmonitorservice->should_display_block();
+        self::assertTrue($shoulddisplay);
+    }
 }

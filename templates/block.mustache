@@ -1,3 +1,17 @@
+{{#block_admin_message}}
+<div id="block-completion-monitor-{{uniqid}}" class="block-completion-monitor">
+    <div class="completion_monitor-custom-header">
+        <div class="main-content no-activity-completion">
+            <h2 class="block_title">
+                {{#str}} blocktitle, block_completion_monitor {{/str}}
+            </h2>
+            <p class="m-0">{{block_admin_message}}</p>
+        </div>
+    </div>
+</div>
+{{/block_admin_message}}
+
+{{^block_admin_message}}
 <div id="block-completion-monitor-{{uniqid}}" class="block-completion-monitor">
     <div class="completion_monitor-custom-header">
         <div class="main-content">
@@ -14,9 +28,7 @@
         </div>
 
         <div class="open-block">
-
-                {{> block_completion_monitor/progress_header/show_more_button }}
-
+            {{> block_completion_monitor/progress_header/show_more_button }}
         </div>
     </div>
 
@@ -29,5 +41,6 @@
             </div>
         </div>
         {{/can_access_report}}
-    </div>   
+    </div>
 </div>
+{{/block_admin_message}}

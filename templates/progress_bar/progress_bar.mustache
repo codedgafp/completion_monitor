@@ -47,12 +47,6 @@
                 {{#activities_details}}
                     {{> block_completion_monitor/progress_bar/activity_item}}
                 {{/activities_details}}
-
-                {{^activities_details}}
-                    <li class="progressbar_empty">
-                        {{#str}} no_activities, block_completion_monitor {{/str}}
-                    </li>
-                {{/activities_details}}
             </ul>
         </div>
 

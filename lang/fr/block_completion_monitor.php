@@ -27,20 +27,20 @@ $string['courseprogress_step'] = '{$a->activitiescompleted} sur {$a->activitiest
 $string['region-top-block'] = 'Zone supérieure du cours';
 $string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi des d\'achèvement des activités du cours';
 
-
 // Progress bar strings.
 $string['progressbar_region_label'] = 'Barre de progression';
 $string['activities_list_label'] = 'Activités du cours';
-$string['no_activities'] = 'Aucune activité à afficher';
+$string['course_progress_disabled'] = 'Le suivi d\'achèvement est désactivé au niveau des paramètres du cours. Ce bloc ne sera donc pas visible pas par les utilisateurs.';
+$string['no_course_activities_progress'] = 'Aucune activité n\'a été paramétrée avec un suivi d\'achèvement. Ce bloc ne sera donc pas visible par les utilisateurs.';
 $string['scroll_left'] = 'Faire défiler vers la gauche';
 $string['scroll_right'] = 'Faire défiler vers la droite';
 
 // Activity details strings.
-$string['required_activity']               = 'Activité requise';
-$string['optional_activity']               = 'Activité optionnelle';
-$string['required_activities']               = 'Activités requises';
-$string['optional_activities']               = 'Activités optionnelles';
-$string['viewactivity']               = 'Voir l\'activité';
+$string['required_activity'] = 'Activité requise';
+$string['optional_activity'] = 'Activité optionnelle';
+$string['required_activities'] = 'Activités requises';
+$string['optional_activities'] = 'Activités optionnelles';
+$string['viewactivity'] = 'Voir l\'activité';
 $string['completionconditions_intro'] = 'Vous devez remplir les conditions suivantes pour terminer cette activité :';
 $string['condition_success'] = 'Condition remplie';
 $string['condition_error'] = 'Condition non remplie';
@@ -50,8 +50,8 @@ $string['optional'] = 'optionnelle';
 
 $string['not_started'] = 'non commencée';
 $string['in_progress'] = 'en cours';
-$string['completed']   = 'validée';
-$string['locked']      = 'accès restreint';
+$string['completed'] = 'validée';
+$string['locked'] = 'accès restreint';
 
 // Legend strings.
 $string['legend'] = 'Légende';

@@ -31,7 +31,8 @@ $string['completion_monitor:addinstance'] = 'Allow adding the Activities Complet
 // Progress bar strings.
 $string['progressbar_region_label'] = 'Progress bar';
 $string['activities_list_label'] = 'Course activities';
-$string['no_activities'] = 'No activities to display';
+$string['course_progress_disabled'] = 'Completion tracking is disabled in the course settings. Therefore, this block will not be visible to users.';
+$string['no_course_activities_progress'] = 'No activities have been configured with completion tracking. Therefore, this block will not be visible to users.';
 $string['scroll_left'] = 'Scroll left';
 $string['scroll_right'] = 'Scroll right';
 

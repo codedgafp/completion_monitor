@@ -87,6 +87,17 @@
                     margin-left: 10px;
                 }
             }
+
+            &.no-activity-completion {
+                max-width: unset;
+                justify-content: unset;
+                gap: 40px;
+
+                @media(max-width: @screen-sm) {
+                    flex-direction: column;
+                    gap: 20px;
+                }
+            }
         }
 
         .open-block {
