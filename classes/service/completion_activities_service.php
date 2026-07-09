@@ -146,6 +146,10 @@ class completion_activities_service
         foreach ($coursemodules as $cm) {
             $available = true;
 
+            if ($cm->get_course_module_record()->deletioninprogress == 1) {
+                continue;
+            }
+
             if (isset($cm->availability)) {
                 $availability = json_decode($cm->availability);
                 $available = $availability->op == '&'
