@@ -56,47 +56,6 @@ class completion_monitor_service
     }
 
     /**
-     * @return bool
-     */
-    public function activities_has_completion(): bool
-    {
-        return $this->accmrepository->activity_has_completion($this->course->id);
-    }
-
-    /**
-     * @return void
-     */
-    public function add_block_to_course(): void
-    {
-        $exists = $this->accmrepository->block_instance_exists($this->contextcourse->id);
-
-        if (!$exists) {
-            $blockRecord = new block_instance_record(
-                blockname: 'completion_monitor',
-                parentcontextid: $this->contextcourse->id,
-                pagetypepattern: 'course-view-*'
-            );
-
-            $this->db->insert_record('block_instances', $blockRecord->buildrecord());
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function remove_block_from_course(): void
-    {
-        $exists = $this->accmrepository->block_instance_exists($this->contextcourse->id);
-
-        if ($exists) {
-            $this->db->delete_records('block_instances', [
-                'blockname' => 'completion_monitor',
-                'parentcontextid' => $this->contextcourse->id
-            ]);
-        }
-    }
-
-    /**
      * @param int $userid
      * @param int $cmid
      * @return string

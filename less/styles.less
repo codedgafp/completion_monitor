@@ -92,11 +92,6 @@
                 max-width: unset;
                 justify-content: unset;
                 gap: 40px;
-
-                @media(max-width: @screen-sm) {
-                    flex-direction: column;
-                    gap: 20px;
-                }
             }
         }
 
@@ -208,6 +203,7 @@
                 .completion_monitor-custom-header {
                     .main-content {
                         width: 100%;
+                        align-items: unset;
 
                         .course-progress-percentage {
                             font-size: 15px;
@@ -225,6 +221,11 @@
                             #completion-monitor-circle-progress {
                                 width: 60px;
                             }
+                        }
+
+                        &.no-activity-completion {
+                            flex-direction: column;
+                            gap: 20px;
                         }
                     }
 

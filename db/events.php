@@ -10,14 +10,6 @@
 defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
-        'eventname' => '\core\event\course_module_created',
-        'callback'  => '\block_completion_monitor\observer::course_module_changed',
-    ],
-    [
-        'eventname' => '\core\event\course_module_updated',
-        'callback'  => '\block_completion_monitor\observer::course_module_changed',
-    ],
-    [
         'eventname' => '\core\event\course_module_completion_updated',
         'callback'  => '\block_completion_monitor\observer::completion_updated',
     ],

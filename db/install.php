@@ -1,15 +1,16 @@
 <?php
 
-defined('MOODLE_INTERNAL') || die();
-use block_completion_monitor\service\add_block_service;
-function xmldb_block_completion_monitor_install()
-{
-    if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
-        mtrace('completion_monitor: installation – ajout des blocks');
+use block_completion_monitor\hook\installed;
 
-        $service = new add_block_service();
-        $service->sync_block();
+/**
+ * Install script for block_completion_monitor.
+ *
+ * @package   block_completion_monitor
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-        mtrace('completion_monitor: installation terminée');
-    }
+function xmldb_block_completion_monitor_install() {
+    \core\di::get(\core\hook\manager::class)
+        ->dispatch(new installed());
+    return true;
 }

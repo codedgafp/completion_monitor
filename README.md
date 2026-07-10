@@ -34,8 +34,6 @@ Après l’installation du plugin, celui-ci sera affiché par défaut dans la ba
 
 ![Exemple de rendu du bloc completion_monitor dans la partie latérale du cours.](./assets/block_completion_monitor_lateral.png)
 
-Il n'est pas possible d'ajouter le bloc manuellement.
-
 ## Position centrale
 ### Introduction
 Vous avez aussi la possibilité d'afficher le bloc completion_monitoring en haut de la page du cours.

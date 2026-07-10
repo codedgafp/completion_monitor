@@ -288,26 +288,6 @@ class completion_monitor_repository
         return $this->db->get_records_sql($sql, $params);
     }
 
-    public function activity_has_completion(int $courseId): bool
-    {
-        return $this->db->record_exists_select(
-            'course_modules',
-            'course = :course AND completion <> :none',
-            [
-                'course' => $courseId,
-                'none' => COMPLETION_TRACKING_NONE
-            ]
-        );
-    }
-
-    public function block_instance_exists(int $contextId): bool
-    {
-        return $this->db->record_exists('block_instances', [
-            'blockname' => 'completion_monitor',
-            'parentcontextid' => $contextId
-        ]);
-    }
-
     public function get_scorm_by_coursemoduleid(int $cmid): ?object
     {
         return $this->db->get_record_sql('
@@ -317,38 +297,5 @@ class completion_monitor_repository
                                 WHERE
                                 cm.id = :cmid
                             ', ['cmid' => $cmid]);
-    }
-    public function get_course_list(): iterable
-    {
-        $sql = "
-            SELECT c.*
-            FROM {course} c
-            JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :courselevel
-            WHERE c.id <> :siteid
-            AND NOT EXISTS (
-                    SELECT 1
-                    FROM {block_instances} bi
-                    WHERE bi.parentcontextid = ctx.id
-                    AND bi.blockname = :blockname
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM {course_modules} cm
-                WHERE cm.course = c.id
-                AND cm.deletioninprogress = 0
-                AND cm.completion <> 0
-            );";
-
-        $rs = $this->db->get_recordset_sql($sql, [
-            'courselevel' => CONTEXT_COURSE,
-            'blockname'   => 'completion_monitor',
-            'siteid'      => SITEID,
-        ]);
-
-        foreach ($rs as $record) {
-            yield $record;
-        }
-
-        $rs->close();
     }
 }

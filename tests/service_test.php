@@ -244,38 +244,6 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         self::assertEquals('url', current($requiredactivities)->get_type());
     }
 
-    public function test_add_block_to_course()
-    {
-        $this->setAdminUser();
-
-        $context = \context_course::instance($this->course->id);
-
-        $exists = $this->repository->block_instance_exists($context->id);
-        self::assertFalse($exists);
-
-        $this->completionmonitorservice->add_block_to_course();
-
-        $exists = $this->repository->block_instance_exists($context->id);
-        self::assertTrue($exists);
-    }
-
-    public function test_remove_block_from_course()
-    {
-        $this->setAdminUser();
-
-        $context = \context_course::instance($this->course->id);
-
-        $this->completionmonitorservice->add_block_to_course();
-
-        $exists = $this->repository->block_instance_exists($context->id);
-        self::assertTrue($exists);
-
-        $this->completionmonitorservice->remove_block_from_course();
-
-        $exists = $this->repository->block_instance_exists($context->id);
-        self::assertFalse($exists);
-    }
-
     public function test_get_activities_details_completion_conditions_ok()
     {
         $this->setAdminUser();
@@ -343,24 +311,6 @@ class block_completion_monitor_service_testcase extends advanced_testcase
         $activitydetails = current($activitiesdetails);
         self::assertNotNull($activitydetails);
         self::assertTrue($activitydetails->get_opennewtab());
-    }
-
-    public function test_add_block_to_course_check_position()
-    {
-        global $DB, $CFG;
-
-        $context = \context_course::instance($this->course->id);
-
-        $exists = $this->repository->block_instance_exists($context->id);
-        self::assertFalse($exists);
-
-        $this->completionmonitorservice->add_block_to_course();
-
-        $exists = $this->repository->block_instance_exists($context->id);
-        self::assertTrue($exists);
-
-        $position = $CFG->blocktopregion ?? BLOCK_POS_LEFT;
-        self::assertEquals($position, $DB->get_field('block_instances', 'defaultregion', ['parentcontextid' => $context->id]));
     }
 
     public function test_should_display_block_completion_disabled()
