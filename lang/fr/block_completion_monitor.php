@@ -30,7 +30,7 @@ $string['completion_monitor:addinstance'] = 'Autoriser l\'ajout du bloc Suivi de
 // Progress bar strings.
 $string['progressbar_region_label'] = 'Barre de progression';
 $string['activities_list_label'] = 'Activités du cours';
-$string['course_progress_disabled'] = 'Le suivi d\'achèvement est désactivé au niveau des paramètres du cours. Ce bloc ne sera donc pas visible pas par les utilisateurs.';
+$string['course_progress_disabled'] = 'Le suivi d\'achèvement est désactivé au niveau des paramètres du cours. Ce bloc ne sera donc pas visible par les utilisateurs.';
 $string['no_course_activities_progress'] = 'Aucune activité n\'a été paramétrée avec un suivi d\'achèvement. Ce bloc ne sera donc pas visible par les utilisateurs.';
 $string['scroll_left'] = 'Faire défiler vers la gauche';
 $string['scroll_right'] = 'Faire défiler vers la droite';
