@@ -59,3 +59,8 @@ $string['show_legend'] = 'Afficher la légende';
 $string['hide_legend'] = 'Masquer la légende';
 
 $string['viewsection'] = 'Aller à la section';
+
+// Suivi de progression
+$title = 'Suivi des données de progression';
+$string['page_header_title'] = '{$a}: ' . $title;
+$string['page_title'] = $title;

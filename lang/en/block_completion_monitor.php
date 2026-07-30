@@ -60,3 +60,8 @@ $string['show_legend'] = 'Show legend';
 $string['hide_legend'] = 'Hide legend';
 
 $string['viewsection'] = 'View section';
+
+// Progress overview page
+$title = 'Tracking progress data';
+$string['page_header_title'] = '{$a}: ' . $title;
+$string['page_title'] = $title;

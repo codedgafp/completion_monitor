@@ -10,7 +10,6 @@ use block_contents;
 
 class renderer extends plugin_renderer_base
 {
-
     private function can_access_report()
     {
         global $COURSE;
@@ -26,10 +25,9 @@ class renderer extends plugin_renderer_base
 
         $templatecontext = new template_context($COURSE);
 
-        $reporturl = $this->can_access_report() ? new moodle_url(
-            '/report/progress/index.php',
-            ['course' => $COURSE->id]
-        ) : '';
+        $reporturl = $this->can_access_report()
+            ? new moodle_url('/blocks/completion_monitor/progress_overview.php', ['courseid' => $COURSE->id])
+            : '';
 
         return $this->render_from_template(
             'block_completion_monitor/block',
