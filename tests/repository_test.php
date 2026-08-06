@@ -154,4 +154,64 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
 
         self::resetAllData();
     }
+
+    /**
+     * Test get_user_course_completion
+     *
+     * @throws dml_exception
+     * @throws moodle_exception
+     *
+     * @covers  \local_mentor_core\database_interface::get_user_course_completion
+     */
+    public function test_get_user_course_completion() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        $DB->delete_records('user_completion');
+
+        $userid = 10;
+        $courseid = 20;
+
+        self::assertFalse($this->repository->get_user_course_completion($userid, $courseid));
+
+        $old = new \stdClass();
+        $old->userid = $userid;
+        $old->courseid = $courseid;
+        $old->completion = 0;
+        $old->lastupdate = time() - 100;
+        $DB->insert_record('user_completion', $old);
+
+        $result = $this->repository->get_user_course_completion($userid, $courseid);
+
+        $this->assertNotFalse($result);
+        $this->assertEquals(0, $result->completion);
+
+        $recent = new \stdClass();
+        $recent->id = $result->id;
+        $recent->completion = 75;
+        $recent->lastupdate = time();
+        $DB->update_record('user_completion', $recent);
+
+        $result = $this->repository->get_user_course_completion($userid, $courseid);
+
+        $this->assertNotFalse($result);
+        $this->assertEquals(75, $result->completion);
+
+        self::resetAllData();
+    }
+
+    /**
+     * Test get_user_course_completion return false when no record exist
+     *
+     * @throws dml_exception
+     * @throws moodle_exception
+     *
+     * @covers  \local_mentor_core\database_interface::get_user_course_completion
+     */
+    public function test_returns_false_when_no_record() {
+        $result = $this->repository->get_user_course_completion(1, 1);
+
+        $this->assertFalse($result);
+    }
 }

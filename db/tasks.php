@@ -14,9 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Plugin scheduled tasks
+ *
+ * @package    local_mentor_core
+ * @copyright  2021 Edunao SAS (contact@edunao.com)
+ * @author     adrien <adrien@edunao.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2026080600;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051219;       // Requires this Moodle version.
-$plugin->component = 'block_completion_monitor';       // Full name of the plugin (used for diagnostics).
+$tasks = [
+    [
+        'classname' => block_completion_monitor\task\update_users_course_completion::class,
+        'blocking' => 0,
+        'disabled' => 1, 
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
+];

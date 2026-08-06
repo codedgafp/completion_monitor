@@ -65,3 +65,6 @@ $string['viewsection'] = 'View section';
 $title = 'Tracking progress data';
 $string['page_header_title'] = '{$a}: ' . $title;
 $string['page_title'] = $title;
+
+// Task
+$string['task_update_users_course_completion'] = 'Update to the course completion percentage';

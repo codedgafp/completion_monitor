@@ -3,7 +3,9 @@
 namespace block_completion_monitor;
 
 use cache;
+use stdClass;
 use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -49,5 +51,42 @@ class observer
 
         $cacheactivitiesreset = cache::make('block_completion_monitor', 'block_completion_updated');
         $cacheactivitiesreset->set("completion_reset_activities_{$userid}_{$courseid}", true);
+    }
+
+    /**
+     * When a completion is updated, set the user_completion processed value to 0
+     * 
+     * @param \core\event\course_module_completion_updated $event
+     * @return void
+     */
+    public static function make_completion_to_processed(\core\event\course_module_completion_updated $event): void
+    {
+        global $DB;
+
+        $data = $event->get_data();
+        $userid = $data['relateduserid'];
+        $courseid = $data['courseid'];
+
+        $usercompletion = $DB->get_record('user_completion', ['userid' => $userid, 'courseid' => $courseid]);
+
+        $completionservice = new completion_activities_service(get_course($courseid));
+        $usercoursecompletion = $completionservice->get_course_completion_details($userid)["percentage"];
+
+        if ($usercompletion) {
+            $usercompletion->completion = $usercoursecompletion;
+            $usercompletion->lastupdate = time();
+            $usercompletion->processed = 0;
+
+            $DB->update_record('user_completion', $usercompletion);
+        } else {
+            $usercompletion = new stdClass();
+            $usercompletion->userid = $userid;
+            $usercompletion->courseid = $courseid;
+            $usercompletion->completion = $usercoursecompletion;
+            $usercompletion->lastupdate = time();
+            $usercompletion->processed = 0;
+
+            $DB->insert_record('user_completion', $usercompletion);
+        }
     }
 }
