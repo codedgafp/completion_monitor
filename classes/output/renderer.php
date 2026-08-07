@@ -2,12 +2,18 @@
 
 namespace block_completion_monitor\output;
 
-use block_completion_monitor\model\template_context;
-use plugin_renderer_base;
 use moodle_url;
+use plugin_renderer_base;
+use block_completion_monitor\model\template_context;
 
 use block_contents;
 
+/**
+ * Renderer class for completion_monitor block
+ *
+ * @package block_completion_monitor
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class renderer extends plugin_renderer_base
 {
     private function can_access_report()
