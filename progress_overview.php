@@ -16,7 +16,7 @@ $PAGE->set_context($context);
 unset($courseid);
 
 require_login($course);
-require_capability('moodle/course:manageactivities', $context);
+require_capability('report/progress:view', $context);
 
 $PAGE->set_title(get_string('page_header_title', 'block_completion_monitor', $course->shortname));
 $PAGE->set_heading($course->fullname);
