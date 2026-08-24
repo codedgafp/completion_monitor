@@ -18,7 +18,7 @@ class update_users_course_completion extends \core\task\scheduled_task
 
     public function get_name(): string
     {
-        return get_string('task_update_users_course_completion', 'local_mentor_core');
+        return get_string('task_update_users_course_completion', 'block_completion_monitor');
     }
 
     public function execute(): void
