@@ -2,9 +2,9 @@
 
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
-use block_completion_monitor\output\progress_overview_content;
 use block_completion_monitor\table\progress_overview;
-use block_completion_monitor\table\progress_overview_filterset;
+use block_completion_monitor\table\progress_overview_filterset as filterset;
+use block_completion_monitor\output\progress_overview_content;
 
 require_once('../../config.php');
 
@@ -37,14 +37,14 @@ echo $OUTPUT->header();
 $table = new progress_overview("progress-overview-$course->id");
 
 // Setup filterset
-$filterset = new progress_overview_filterset();
+$filterset = new filterset();
 
-$filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int) $course->id]));
+$filterset->add_filter(new integer_filter(filterset::COURSEID, filter::JOINTYPE_DEFAULT, [(int) $course->id]));
 
 $table->set_filterset($filterset);
 
 // Render template with table
-$renderable = new progress_overview_content($table);
+$renderable = new progress_overview_content($table, $context);
 $data = $renderable->export_for_template($OUTPUT);
 
 echo $OUTPUT->render_from_template('block_completion_monitor/progress_overview/index', $data);

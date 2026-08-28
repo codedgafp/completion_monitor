@@ -1,0 +1,7 @@
+{{> core/datafilter/filter }}
+
+{{#js}}
+    require(['block_completion_monitor/progress_overview_filter'], function(ProgressOverviewFilter) {
+        ProgressOverviewFilter.init('core-filter-{{uniqid}}');
+    });
+{{/js}}

@@ -185,6 +185,8 @@ class progress_overview extends \table_sql implements dynamic
     {
         global $DB;
 
+        $posearch = new progress_overview_search($this->courseid, $this->context, $this->filterset);
+
         // Get where and params from the name filter
         list($where, $params) = $this->get_sql_where();
 
@@ -193,7 +195,6 @@ class progress_overview extends \table_sql implements dynamic
 
         $this->use_pages = true;
 
-        $posearch = new progress_overview_search($this->courseid);
         $rawdata = $posearch->get_participants($where, $params, $sort, $this->get_page_start(), $this->get_page_size());
 
         $total = $rawdata->current()->fullcount ?? 0;
@@ -218,7 +219,7 @@ class progress_overview extends \table_sql implements dynamic
      */
     public function set_filterset(filterset $filterset): void
     {
-        $this->courseid = $filterset->get_filter('courseid')->current();
+        $this->courseid = $filterset->get_filter(progress_overview_filterset::COURSEID)->current();
         $this->context = \context_course::instance($this->courseid, MUST_EXIST);
 
         parent::set_filterset($filterset);
@@ -239,8 +240,7 @@ class progress_overview extends \table_sql implements dynamic
      */
     public function has_capability(): bool
     {
-        // TODO: à modifier
-        return true;
+        return has_capability('report/progress:view', $this->context);
     }
 
     /**

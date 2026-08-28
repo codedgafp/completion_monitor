@@ -382,4 +382,34 @@ class completion_monitor_repository
         $usercompletion->processed = 0;
         $this->db->insert_record('user_completion', $usercompletion);
     }
+
+    /**
+     * Get groups id from grouping ids list
+     * 
+     * @param array $groupingids
+     * @param int $courseid
+     * @return array
+     */
+    public function get_groups_from_grouping(array $groupingids, int $courseid): array
+    {
+        if (empty($groupingids)) {
+            return [];
+        }
+
+        [$groupingsql, $groupingparams] = $this->db->get_in_or_equal($groupingids, SQL_PARAMS_NAMED, 'grouping');
+
+        $sql = "SELECT g.id
+                FROM {groupings_groups} gg
+                INNER JOIN {groups} g
+                    ON gg.groupid = g.id
+                WHERE g.courseid = :courseid
+                AND gg.groupingid $groupingsql
+                ";
+
+        $params = [
+            'courseid' => $courseid
+        ];
+
+        return $this->db->get_fieldset_sql($sql, $params + $groupingparams);
+    }
 }
