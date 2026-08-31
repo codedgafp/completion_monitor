@@ -329,16 +329,16 @@ class completion_monitor_repository
      */
     public function get_last_users_completions(int $lastrows, bool $count = false): array
     {
-        $endsql = "";
-        $params = [];
+        $limitfrom = 0;
+        $limitnum = 0;
 
         if (!$count) {
             global $CFG;
-            $endsql = " LIMIT :limit OFFSET :lastrows";
-            $params = [
-                'limit' => $CFG->completion_limit_result,
-                'lastrows' => $lastrows,
-            ];
+
+            $completionlimitresult = isset($CFG->completion_limit_result) ? $CFG->completion_limit_result : 10000;
+
+            $limitfrom = $lastrows;
+            $limitfrom = $completionlimitresult;
         }
 
         $sql = "SELECT
@@ -351,10 +351,9 @@ class completion_monitor_repository
                     ON uc.courseid = c.id
                 WHERE uc.processed = 0
                 ORDER BY uc.id ASC
-                $endsql
                 ";
 
-        return $this->db->get_records_sql($sql, $params);
+        return $this->db->get_records_sql($sql, null, $limitfrom, $limitnum);
     }
 
     /**

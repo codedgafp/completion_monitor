@@ -39,7 +39,9 @@ class update_users_course_completion extends \core\task\scheduled_task
 
         $this->log("Nombre total d'enregistrements à traiter : $countusercompletion");
 
-        $iterations = ceil($countusercompletion / $CFG->completion_limit_result);
+        $completionlimitresult = isset($CFG->completion_limit_result) ? $CFG->completion_limit_result : 10000;
+
+        $iterations = ceil($countusercompletion / $completionlimitresult);
 
         $totalupdates = 0;
 
