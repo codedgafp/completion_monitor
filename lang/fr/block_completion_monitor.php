@@ -66,6 +66,7 @@ $string['page_header_title'] = '{$a}: ' . $title;
 $string['page_title'] = $title;
 $string['table_header_lastaccess'] = "Dernière visite";
 $string['table_header_completion'] = "Progression";
+$string['loading'] = "Chargement en cours ...";
 
 // Task
 $string['task_update_users_course_completion'] = 'Mise à jour du pourcentage de complétion des cours';

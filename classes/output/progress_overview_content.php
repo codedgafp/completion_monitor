@@ -2,11 +2,11 @@
 
 namespace block_completion_monitor\output;
 
-use stdClass;
 use core\output\renderable;
 use core\output\templatable;
 use core\output\renderer_base;
 use block_completion_monitor\table\progress_overview;
+use block_completion_monitor\service\progress_overview_content_service;
 
 /**
  * Renderable for the table.
@@ -18,35 +18,28 @@ class progress_overview_content implements renderable, templatable
 {
     public function __construct(
         protected progress_overview $table,
-        protected \context $context
+        protected \context $context,
+        protected int $courseid
     ) {}
 
-    public function export_for_template(renderer_base $output): array|stdClass
+    public function export_for_template(renderer_base $output): array|\stdClass
     {
         global $PAGE;
 
+        $contentservice = new progress_overview_content_service($this->table, $this->courseid);
+
         $this->table->define_baseurl($PAGE->url);
 
-        $data = new stdClass();
-        $data->filterhtml = $this->get_filter_html($output);
+        $data = new \stdClass();
+
         $data->tablehtml = $this->get_table_html();
 
-        return $data;
-    }
+        $data->tableuniqueid = $this->table->uniqueid;
+        $data->filterhtml = $contentservice->get_filter_html($output, $this->context);
+        $data->countusers = $contentservice->get_count_users_html();
+        $data->hiddeninputshtml = $contentservice->get_hidden_inputs_html();
 
-    /**
-     * Render filter html
-     * 
-     * @param renderer_base $output
-     * @return bool|string
-     */
-    private function get_filter_html(renderer_base $output): string|bool
-    {
-        $filter = new progress_overview_filter($this->context, $this->table->uniqueid);
-        return $output->render_from_template(
-            'block_completion_monitor/progress_overview/progress_overview_filter',
-            $filter->export_for_template($output)
-        );
+        return $data;
     }
 
     /**

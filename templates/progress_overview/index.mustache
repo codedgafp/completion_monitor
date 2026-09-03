@@ -2,8 +2,15 @@
 
 <h2 class="mb-5">{{#str}}page_title, block_completion_monitor{{/str}}</h2>
 
-<div class="mb-5">
+<div class="mb-3">
     {{{filterhtml}}}
 </div>
 
-{{{tablehtml}}}
+
+<form action="action_redir.php" method="POST" id="progressoverviewform" data-table-unique-id="{{{tableuniqueid}}}">
+    {{{countusers}}}
+
+    {{{tablehtml}}}
+
+    {{{hiddeninputshtml}}}
+</form>

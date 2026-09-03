@@ -37,6 +37,10 @@ echo $OUTPUT->header();
 // Setup table
 $table = new progress_overview("progress-overview-$course->id");
 
+$bulkoptions = (object) [
+    'tableId' => $table->uniqueid
+];
+
 // Setup filterset
 $filterset = new filterset();
 
@@ -45,9 +49,11 @@ $filterset->add_filter(new integer_filter(filterset::COURSEID, filter::JOINTYPE_
 $table->set_filterset($filterset);
 
 // Render template with table
-$renderable = new progress_overview_content($table, $context);
+$renderable = new progress_overview_content($table, $context, $course->id);
 $data = $renderable->export_for_template($OUTPUT);
 
 echo $OUTPUT->render_from_template('block_completion_monitor/progress_overview/index', $data);
+
+$PAGE->requires->js_call_amd('block_completion_monitor/progress_overview', 'init', [$bulkoptions]);
 
 echo $OUTPUT->footer();

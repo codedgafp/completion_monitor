@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace block_completion_monitor\table;
 
-use context;
-use moodle_url;
-use html_writer;
 use core_table\dynamic;
 use core\output\checkbox_toggleall;
 use core_table\local\filter\filterset;
+use block_completion_monitor\service\progress_overview_content_service;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -29,13 +27,13 @@ class progress_overview extends \table_sql implements dynamic
 
     /**
      * The course context.
-     * @var context $context
+     * @var \context $context
      */
-    protected context $context;
+    protected \context $context;
 
     /**
      * The base url page where the table is render.
-     * @var moodle_url $baseurl
+     * @var \moodle_url $baseurl
      */
     public $baseurl;
 
@@ -94,7 +92,7 @@ class progress_overview extends \table_sql implements dynamic
         $this->sortable(true, 'completion');
         $this->no_sorting('select');
 
-        $this->set_default_per_page(10);
+        $this->set_default_per_page(20);
 
         parent::out($pagesize, $useinitialsbar, $downloadhelpbutton);
     }
@@ -231,7 +229,7 @@ class progress_overview extends \table_sql implements dynamic
      */
     public function guess_base_url(): void
     {
-        $this->baseurl = new moodle_url('blocks/completion_monitor/progress_overview.php', ['courseid' => $this->courseid]);
+        $this->baseurl = new \moodle_url('blocks/completion_monitor/progress_overview.php', ['courseid' => $this->courseid]);
     }
 
     /**
@@ -249,34 +247,23 @@ class progress_overview extends \table_sql implements dynamic
      *
      * Note: This function should not be called until after the filterset has been provided.
      *
-     * @return context
+     * @return \context
      */
-    public function get_context(): context
+    public function get_context(): \context
     {
         return $this->context;
     }
 
     public function wrap_html_start(): void
     {
-        $attributes = [
-            'type' => 'button',
-            'id' => 'send-message-button',
-            'class' => 'btn btn-primary mb-2',
-            'data-action' => 'toggle',
-            'data-toggle' => 'action',
-            'data-togglegroup' => 'progress-overview-table',
-            'data-courseid' => $this->courseid,
-            'disabled' => 'disabled',
-        ];
+        $contentservice = new progress_overview_content_service($this, $this->courseid);
 
-        $icon = html_writer::tag('i', '', [
-            'class' => 'icon fa-solid fa-paper-plane fa-fw mr-1',
-            'aria-hidden' => 'true',
-        ]);
+        $checkallhtml = $contentservice->get_checkall_html();
+        $selecthtml = $contentservice->get_bulkaction_html();
+        $messagebutton = $contentservice->get_messagebutton_html();
 
-        $label = get_string('sendmessage_button', 'block_completion_monitor');
-        $button = html_writer::tag('button', $icon . $label, $attributes);
+        $or = \html_writer::tag("p", get_string('or', 'availability'), ["class" => "m-0"]);
 
-        echo html_writer::div($button, 'd-flex justify-content-end');
+        echo \html_writer::div($checkallhtml . $messagebutton . $or . $selecthtml, 'd-flex justify-content-end align-items-center mb-2');
     }
 }

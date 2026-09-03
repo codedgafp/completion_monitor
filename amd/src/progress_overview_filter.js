@@ -6,13 +6,12 @@
  */
 
 define([
-    'jquery',
     'core/datafilter',
     'core_table/dynamic',
     'core/datafilter/selectors',
     'core/notification',
     'core/pending'
-], function ($, CoreFilter, DynamicTable, Selectors, Notification, Pending) {
+], function (CoreFilter, DynamicTable, Selectors, Notification, Pending) {
     let progress_overview_filter = {
 
         init: function(filterRegionId) {
