@@ -52,6 +52,7 @@ $string['not_started'] = 'non commencée';
 $string['in_progress'] = 'en cours';
 $string['completed'] = 'validée';
 $string['locked'] = 'accès restreint';
+$string['hide'] = 'cachée';
 
 // Legend strings.
 $string['legend'] = 'Légende';

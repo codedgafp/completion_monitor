@@ -53,6 +53,7 @@ $string['not_started'] = 'not started';
 $string['in_progress'] = 'in progress';
 $string['completed']   = 'completed';
 $string['locked']      = 'locked';
+$string['hide']        = 'hide';
 
 // Legend strings.
 $string['legend'] = 'Legend';

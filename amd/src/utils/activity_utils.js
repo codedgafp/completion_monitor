@@ -8,6 +8,7 @@ define([], function () {
         in_progress: 'in_progress',
         completed: 'completed',
         locked: 'locked',
+        hide: 'hide',
         required: 'required',
         optional: 'optional',
     }
@@ -17,6 +18,7 @@ define([], function () {
         [SERVER_KEYS.in_progress]: 'inprogress',
         [SERVER_KEYS.completed]: 'completed',
         [SERVER_KEYS.locked]: 'locked',
+        [SERVER_KEYS.hide]: 'hide',
     };
 
     const COLOR_CLASS = 'completion_monitor-color';
@@ -33,6 +35,7 @@ define([], function () {
         [SERVER_KEYS.in_progress]: 'in_progress',
         [SERVER_KEYS.completed]: 'completed',
         [SERVER_KEYS.locked]: 'locked',
+        [SERVER_KEYS.hide]: 'hide',
     };
 
     const ICON_MAP = {
@@ -40,6 +43,7 @@ define([], function () {
         [SERVER_KEYS.in_progress]: 'play',
         [SERVER_KEYS.completed]: 'check',
         [SERVER_KEYS.locked]: 'lock',
+        [SERVER_KEYS.hide]: 'ban',
     };
 
     const getColorClass = (status, required) => {

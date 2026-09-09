@@ -22,6 +22,8 @@ class activity_details
 
     private const LOCKED = 'locked';
 
+    private const HIDE = 'hide';
+
     private ?string $type = null;
 
     private ?string $modulename = null;
