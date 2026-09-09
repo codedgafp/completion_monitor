@@ -6,6 +6,7 @@ namespace block_completion_monitor\table;
 
 use context;
 use moodle_url;
+use html_writer;
 use core_table\dynamic;
 use core\output\checkbox_toggleall;
 use core_table\local\filter\filterset;
@@ -146,7 +147,7 @@ class progress_overview extends \table_sql implements dynamic
      */
     private function define_checkbox(bool $ismaster, string $id, string $name, string $label, string $labelclasses, string $classes, bool $checked = false): checkbox_toggleall
     {
-        return new checkbox_toggleall('participants-table', $ismaster, [
+        return new checkbox_toggleall('progress-overview-table', $ismaster, [
             'id' => $id,
             'name' => $name,
             'label' => $label,
@@ -253,5 +254,29 @@ class progress_overview extends \table_sql implements dynamic
     public function get_context(): context
     {
         return $this->context;
+    }
+
+    public function wrap_html_start(): void
+    {
+        $attributes = [
+            'type' => 'button',
+            'id' => 'send-message-button',
+            'class' => 'btn btn-primary mb-2',
+            'data-action' => 'toggle',
+            'data-toggle' => 'action',
+            'data-togglegroup' => 'progress-overview-table',
+            'data-courseid' => $this->courseid,
+            'disabled' => 'disabled',
+        ];
+
+        $icon = html_writer::tag('i', '', [
+            'class' => 'icon fa-solid fa-paper-plane fa-fw mr-1',
+            'aria-hidden' => 'true',
+        ]);
+
+        $label = get_string('sendmessage_button', 'block_completion_monitor');
+        $button = html_writer::tag('button', $icon . $label, $attributes);
+
+        echo html_writer::div($button, 'd-flex justify-content-end');
     }
 }

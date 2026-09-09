@@ -30,6 +30,7 @@ $PAGE->set_title(get_string('page_header_title', 'block_completion_monitor', $co
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add(get_string('page_title', 'block_completion_monitor'), $PAGE->url);
 $PAGE->set_pagelayout('report');
+$PAGE->requires->js_call_amd('block_completion_monitor/send_message', 'init');
 
 echo $OUTPUT->header();
 

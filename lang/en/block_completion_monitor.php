@@ -70,3 +70,12 @@ $string['table_header_completion'] = "Course progress";
 
 // Task
 $string['task_update_users_course_completion'] = 'Update to the course completion percentage';
+
+
+$string['sendmessage_button'] = 'Send a message';
+$string['sendmessage_title_single'] = 'Send message to 1 person';
+$string['sendmessage_title_multiple'] = 'Send message to {$a} people';
+$string['sendmessage_subject'] = 'Message sent from {$a}';
+$string['sendmessage_success_single'] = 'Message sent to 1 person.';
+$string['sendmessage_success_multiple'] = 'Message sent to {$a} people.';
+$string['sendmessage_error'] = 'The message could not be sent to all recipients.';
