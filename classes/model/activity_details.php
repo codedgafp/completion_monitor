@@ -222,8 +222,17 @@ class activity_details
         $completioninfo = new \completion_info($course);
         $completion = $completioninfo->get_data($cm, true, $userid);
 
-        if (!is_null($cm->availability)) {
-            return self::LOCKED;
+        if ((int) $cm->visible === 0) {
+            return self::HIDE;
+        }
+
+        if (isset($cm->availability)) {
+            $availability = json_decode($cm->availability);
+            $available = $availability->op == '&'
+                ? !in_array(false, $availability->showc)
+                : $availability->show;
+
+            return $available ? self::LOCKED : self::HIDE;
         }
 
         $completionviewed = $service->course_module_has_beed_viewed($userid, $cm->id) ? COMPLETION_INCOMPLETE : null;
