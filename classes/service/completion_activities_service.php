@@ -44,7 +44,7 @@ class completion_activities_service
     public function get_course_completion_details(int $userid): array
     {
         $modinfo = get_fast_modinfo($this->course, $userid);
-        $activities = $this->get_activities_details($modinfo);
+        $activities = $this->get_activities_details($modinfo, $userid);
         $activities = array_filter($activities, fn(activity_details $activity) => $activity->get_required() == true);
 
         $coursecompletionsdetails = [
@@ -85,7 +85,7 @@ class completion_activities_service
         $coursecontext = context_course::instance($this->course->id);
         $modinfo = get_fast_modinfo($this->course, $userid);
 
-        $activities = $this->get_activities_details($modinfo);
+        $activities = $this->get_activities_details($modinfo, $userid);
 
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid);
 
@@ -123,15 +123,17 @@ class completion_activities_service
      * @param course_modinfo|null $modinfo
      * @return activity_details[]
      */
-    public function get_activities_details(course_modinfo $modinfo = null): array
+    public function get_activities_details(course_modinfo $modinfo = null, ?int $userid = null, bool $isprogressoverview = false): array
     {
         global $USER;
+
+        $user = $userid === null ? $USER : get_complete_user_data("id", $userid, true);
 
         $coursecompletion = new \completion_info($this->course);
         $coursecompletionactivities = $coursecompletion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
 
         if ($modinfo === null)
-            $modinfo = get_fast_modinfo($this->course, $USER->id);
+            $modinfo = get_fast_modinfo($this->course, $user->id);
 
         $sections = $modinfo->get_sections();
         $coursemodules = $modinfo->get_cms();
@@ -140,7 +142,9 @@ class completion_activities_service
         $coursecompletioncriterialist = $this->db->get_records('course_completion_criteria', ['course' => $this->course->id]);
 
         $coursecontext = context_course::instance($this->course->id);
-        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
+
+        $usercapability = $isprogressoverview ? $USER : $user;
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $usercapability->id);
 
         // Create activities list with completion set.
         foreach ($coursemodules as $cm) {
@@ -164,22 +168,23 @@ class completion_activities_service
                 continue;
 
             if (isset($cm->availability) && $available) {
-                $activities[] = $this->build_activity_details($cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
+                $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
                 continue;
             }
 
-            $activities[] = $this->build_activity_details($cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
+            $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
         }
 
         return $activities;
     }
 
     private function build_activity_details(
-        cm_info $cm,
-        object  $coursecompletion,
-        array   $coursecompletioncriterialist,
-        array   $coursecompletionactivities,
-        array   $sections
+        \stdClass   $user,
+        cm_info     $cm,
+        object      $coursecompletion,
+        array       $coursecompletioncriterialist,
+        array       $coursecompletionactivities,
+        array       $sections
     ): activity_details {
         $module = $cm->modname;
         $required = $this->is_activity_required(
@@ -189,7 +194,7 @@ class completion_activities_service
             $coursecompletionactivities
         );
 
-        $activitydetails = new activity_details($cm, $coursecompletion);
+        $activitydetails = new activity_details($cm, $user, $coursecompletion);
         $activitydetails->set_type($module);
         $activitydetails->set_modulename($cm->get_module_type_name());
         $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));

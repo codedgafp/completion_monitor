@@ -58,8 +58,11 @@ class activity_details
 
     private bool $issectionurl = false;
 
-    public function __construct(\cm_info $cm, \completion_info $completioninfo = null)
-    {
+    public function __construct(
+        \cm_info $cm,
+        protected \stdClass $user,
+        \completion_info $completioninfo = null
+    ) {
         $course = get_course($cm->course);
 
         $service = new completion_activities_service($course);
@@ -175,11 +178,10 @@ class activity_details
      */
     private function get_activity_completion_conditions(\cm_info $coursemodule, \completion_info $completioninfo): array
     {
-        global $USER;
         $conditions = [];
 
         if ($coursemodule->completion == COMPLETION_TRACKING_MANUAL) {
-            $completiondata = $completioninfo->get_data($coursemodule, false, $USER->id);
+            $completiondata = $completioninfo->get_data($coursemodule, false, $this->user->id);
             $conditions = [
                 [
                     "status" => $completiondata->completionstate == COMPLETION_COMPLETE,
@@ -187,7 +189,7 @@ class activity_details
                 ]
             ];
         } else {
-            $cmcompletion = cm_completion_details::get_instance($coursemodule, $USER->id);
+            $cmcompletion = cm_completion_details::get_instance($coursemodule, $this->user->id);
             $cmcompletiondetails = $cmcompletion->get_details();
 
             /**
@@ -214,11 +216,9 @@ class activity_details
      */
     private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm): string
     {
-        global $USER;
-
         $service = new completion_monitor_service($course);
 
-        $userid = $USER->id;
+        $userid = $this->user->id;
         $completioninfo = new \completion_info($course);
         $completion = $completioninfo->get_data($cm, true, $userid);
 
@@ -277,8 +277,6 @@ class activity_details
 
     private function showurl($cm): string
     {
-        global $USER;   
-
         if ($cm->modname === 'scorm' && $this->opennewtab) {
             $url = new \moodle_url('/local/mentor_core/pages/scorm.php', ['cmid' => $cm->id]);
             return $url->out(false);
@@ -294,7 +292,7 @@ class activity_details
             return '';
         } else {
             $coursecontext = \context_course::instance($cm->course);
-            $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $USER->id);
+            $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $this->user->id);
 
             $isurloutmethodexists = method_exists($cm->url, 'out');
 

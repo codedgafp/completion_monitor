@@ -7,6 +7,7 @@ namespace block_completion_monitor\table;
 use core_table\dynamic;
 use core\output\checkbox_toggleall;
 use core_table\local\filter\filterset;
+use block_completion_monitor\service\completion_activities_service;
 use block_completion_monitor\service\progress_overview_content_service;
 
 defined('MOODLE_INTERNAL') || die;
@@ -30,6 +31,12 @@ class progress_overview extends \table_sql implements dynamic
      * @var \context $context
      */
     protected \context $context;
+
+    /**
+     * The progress bar html
+     * @var string
+     */
+    protected string $progressbarhtml;
 
     /**
      * The base url page where the table is render.
@@ -77,6 +84,7 @@ class progress_overview extends \table_sql implements dynamic
         $tablelayout = array_merge($tablelayout, [
             "lastaccess" => get_string('table_header_lastaccess', 'block_completion_monitor'),
             "completion" => get_string('table_header_completion', 'block_completion_monitor'),
+            "activityprogress" => get_string('table_activity_progress', 'block_completion_monitor'),
         ]);
 
         $this->define_table_layout($headers, $columns, $tablelayout);
@@ -128,8 +136,20 @@ class progress_overview extends \table_sql implements dynamic
         return $data->completion ? (string) $data->completion : "0";
     }
 
-    // TODO: in MEN-1423
-    // public function col_activityprogress($data) {}
+    public function col_activityprogress($data) {
+        global $OUTPUT;
+
+        $course = get_course($this->courseid);
+        $service = new completion_activities_service($course);
+
+        $userid = (int) $data->id;
+        $modinfo = get_fast_modinfo($course, $userid);
+
+        $activities = $service->get_activities_details($modinfo, $userid, true);
+        $options["activities_details"] = array_map(fn(/** @var activity_details */ $activity) => $activity->buildrecord(), $activities);
+
+        return $OUTPUT->render_from_template('block_completion_monitor/progress_overview/progress_bar', $options);
+    }
 
     /**
      * Return checkbox_toggleall template.
