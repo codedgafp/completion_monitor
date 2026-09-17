@@ -43,21 +43,19 @@ define([
             this.courseId = courseid;
             this.userId = userid;
 
-            let that = this;
-
-            that.initProgressBarRows();
+            this.initProgressBarRows();
 
             if (!form) {
                 throw new Error(Selectors.form + "does not exist.");
             }
 
-            that.whenCheckboxChecked();
-            that.checkAllButton();
-            that.refreshedTable();
+            this.whenCheckboxChecked();
+            this.checkAllButton();
+            this.refreshedTable();
 
             CustomEvents.define(Selectors.bulkactionselect, [CustomEvents.events.accessibleChange]);
 
-            that.bulkActionsSelected();
+            this.bulkActionsSelected();
         },
 
         /**
@@ -207,26 +205,43 @@ define([
             });
         },
 
-        resetBulkAction: function (bulkActionSelect) {
-            bulkActionSelect.value = '';
-        },
-
+        /**
+         * Enables the progress bar features in each row of the table.
+         * Also controls whether activity details are shown or hidden.
+         */
         initProgressBarRows: function () {
             const $progressBarRows = $(Selectors.form + ' [data-region="progressbar"]');
+            let $activeActivity = null;
 
             if (!$progressBarRows.length) return;
 
-            self = this;
+            const self = this;
 
             $progressBarRows.each(function () {
-                new ProgressBar($(this), self.courseId, self.userId);
+                const $row = $(this);
 
-                this.activityDetail = new ActivityDetail(
-                    $('.block_completion_monitor .progressbar_detail-container'),
+                new ProgressBar($row, self.courseId, self.userId);
+
+                const activityDetail = new ActivityDetail(
+                    $row.find('.progressbar_detail-container'),
                     self.courseId,
                     self.userId
                 );
+
+                $row.on('progressbar:activity:selected', function (e, vm) {
+                    if ($activeActivity && $activeActivity !== activityDetail) {
+                        $activeActivity.close();
+                    }
+
+                    $activeActivity = activityDetail;
+
+                    activityDetail.toggle(vm);
+                });
             });
+        },
+
+        resetBulkAction: function (bulkActionSelect) {
+            bulkActionSelect.value = '';
         },
     }
 
