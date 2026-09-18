@@ -1,11 +1,10 @@
 define([
     'jquery',
     'core/templates',
-    'core_user/repository',
     'block_completion_monitor/progress_bar',
     'block_completion_monitor/activity_detail',
     'block_completion_monitor/legend',
-], function ($, Templates, UserRepository, ProgressBar, ActivityDetail, Legend) {
+], function ($, Templates, ProgressBar, ActivityDetail, Legend) {
     let block_completion_monitor = {
         /**
          * Init JS

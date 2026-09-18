@@ -1,0 +1,45 @@
+{{!
+    Template : local_progressbar/progress_bar
+    Progress bar
+
+    Attempted data:
+      - activities       {Array}   list of activities to display in the progress bar, each with:
+        - id            {int}     activity id
+        - name          {string}  activity name
+        - type          {string}  activity type
+        - icon          {string}  activity icon
+        - required      {bool}    true = activity mandatory, false = activity optional
+        - status        {string}  'completed' | 'inprogress' | 'not_started' | 'locked'
+        - opennewtab    {bool}    true = open in new tab, false = open in same tab
+        - completionconditions {string}  JSON encoded array of completion conditions
+      - uniqid           {String}  identifiant unique de l'instance (pour aria)
+}}
+
+<div
+    class="progressbar_wrapper"
+    id="progressbar-wrapper-{{uniqid}}"
+    role="region"
+    aria-label="{{#str}} progressbar_region_label, block_completion_monitor {{/str}}"
+    data-region="progressbar"
+>
+    <div class="progressbar_bar-row">
+        <div
+            class="progressbar_list-viewport"
+            aria-hidden="false"
+        >
+            <ul
+                class="progressbar_list"
+                id="progressbar-list-{{uniqid}}"
+                role="list"
+                aria-label="{{#str}} activities_list_label, block_completion_monitor {{/str}}"
+            >
+                {{#activities_details}}
+                    {{> block_completion_monitor/progress_bar/activity_item}}
+                {{/activities_details}}
+            </ul>
+        </div>
+    </div>
+    <div class="progressbar_bottom-row">
+        <div id="progressbar_detail" class="progressbar_detail-container" aria-live="polite" aria-atomic="true"></div>
+    </div>
+</div>

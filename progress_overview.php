@@ -38,7 +38,9 @@ echo $OUTPUT->header();
 $table = new progress_overview("progress-overview-$course->id");
 
 $bulkoptions = (object) [
-    'tableId' => $table->uniqueid
+    'tableid'   => $table->uniqueid,
+    'courseid'  => $course->id,
+    'userid'    => $USER->id
 ];
 
 // Setup filterset

@@ -33,12 +33,6 @@ class progress_overview extends \table_sql implements dynamic
     protected \context $context;
 
     /**
-     * The progress bar html
-     * @var string
-     */
-    protected string $progressbarhtml;
-
-    /**
      * The base url page where the table is render.
      * @var \moodle_url $baseurl
      */
@@ -99,6 +93,14 @@ class progress_overview extends \table_sql implements dynamic
         $this->sortable(true, 'lastaccess');
         $this->sortable(true, 'completion');
         $this->no_sorting('select');
+        $this->no_sorting('activityprogress');
+
+        $this->column_class('select', 'col-select');
+        $this->column_class('fullname', 'col-fullname');
+        $this->column_class('email', 'col-email');
+        $this->column_class('lastaccess', 'col-lastaccess');
+        $this->column_class('completion', 'col-completion');
+        $this->column_class('activityprogress', 'col-activityprogress');
 
         $this->set_default_per_page(20);
 
