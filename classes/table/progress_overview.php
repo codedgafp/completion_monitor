@@ -78,7 +78,7 @@ class progress_overview extends \table_sql implements dynamic
         $tablelayout = array_merge($tablelayout, [
             "lastaccess" => get_string('table_header_lastaccess', 'block_completion_monitor'),
             "completion" => get_string('table_header_completion', 'block_completion_monitor'),
-            "activityprogress" => get_string('table_activity_progress', 'block_completion_monitor'),
+            "activityprogress" => get_string('table_header_activity_progress', 'block_completion_monitor'),
         ]);
 
         $this->define_table_layout($headers, $columns, $tablelayout);

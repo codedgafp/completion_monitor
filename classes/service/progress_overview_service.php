@@ -12,6 +12,12 @@ use block_completion_monitor\repository\progress_overview_repository;
  */
 final class progress_overview_service
 {
+    /**
+     * Moodle course object.
+     * @var \stdClass
+     */
+    protected \stdClass $course;
+
     public function __construct(
         protected int $courseid,
         protected \context $context,
@@ -23,6 +29,7 @@ final class progress_overview_service
 
         $this->db = $DB;
         $this->repository = new progress_overview_repository();
+        $this->course = get_course($courseid);
     }
 
     /**
@@ -58,6 +65,12 @@ final class progress_overview_service
                 $columnnames['lastaccess'] = get_string('table_header_lastaccess', 'block_completion_monitor');
                 $columnnames['completion'] = get_string('table_header_completion', 'block_completion_monitor');
 
+                $completionactivitiesservice = new completion_activities_service($this->course);
+                $activities = $completionactivitiesservice->get_activities_details();
+                foreach ($activities as $index => $activity) {
+                    $columnnames["progress_activity_$index"] = get_string('export_header_activity_progress', 'block_completion_monitor', $activity->get_name());
+                }
+
                 $userstodownload = $this->repository->get_users_to_download($this->context, $userids, $userfields, $this->courseid);
 
                 // Provide callback to pre-process all records ensuring user identity fields are escaped if HTML supported.
@@ -66,12 +79,22 @@ final class progress_overview_service
                     $dataformat,
                     $columnnames,
                     $userstodownload,
-                    function (\stdClass $record, bool $supportshtml) use ($identityfields): \stdClass {
+                    function (\stdClass $record, bool $supportshtml) use ($identityfields, $completionactivitiesservice): \stdClass {
                         if ($supportshtml) {
                             foreach ($identityfields as $identityfield) {
                                 $record->{$identityfield} = s($record->{$identityfield});
                             }
                         }
+
+                        $modinfo = get_fast_modinfo($this->course, $record->userid);
+                        $activities = $completionactivitiesservice->get_activities_details($modinfo, $record->userid, true);
+
+                        foreach ($activities as $index => $activity) {
+                            $indexname = "progress_activity_$index";
+                            $record->$indexname = get_string($activity->get_status(), 'block_completion_monitor');
+                        }
+
+                        unset($record->userid);
 
                         return $record;
                     }

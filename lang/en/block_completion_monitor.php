@@ -69,7 +69,8 @@ $string['page_title'] = $title;
 $string['loading'] = "Loading ...";
 $string['table_header_lastaccess'] = "Last access";
 $string['table_header_completion'] = "Course progress";
-$string['table_activity_progress'] = "Progress by activity";
+$string['table_header_activity_progress'] = "Progress by activity";
+$string['export_header_activity_progress'] = 'Progress: {$a}';
 
 // Task
 $string['task_update_users_course_completion'] = 'Update to the course completion percentage';

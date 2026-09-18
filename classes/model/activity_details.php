@@ -84,11 +84,10 @@ class activity_details
         $this->opennewtab = $service->set_opennewtab_for_scorm($cm);
         $this->url = $this->showurl($cm);
         $this->issectionurl = $this->is_section_url();
-    
     }
 
     public function buildrecord(): array
-    { 
+    {
         return [
             "id"                    => $this->id,
             "type"                  => $this->type,
@@ -134,6 +133,11 @@ class activity_details
         return $this->instance;
     }
 
+    public function get_name(): ?string
+    {
+        return $this->name;
+    }
+
     public function set_position(int $position): void
     {
         $this->position = $position;
@@ -161,7 +165,12 @@ class activity_details
     {
         return $this->completionconditions;
     }
-    
+
+    public function get_status(): ?string
+    {
+        return $this->status;
+    }
+
     public function get_opennewtab(): bool
     {
         return $this->opennewtab;
@@ -280,7 +289,7 @@ class activity_details
         if ($cm->modname === 'scorm' && $this->opennewtab) {
             $url = new \moodle_url('/local/mentor_core/pages/scorm.php', ['cmid' => $cm->id]);
             return $url->out(false);
-        }    
+        }
         $urlisnull = is_null($cm->url);
         if ($urlisnull) {
             if ($cm->modname === 'label' && !empty($cm->section)) {

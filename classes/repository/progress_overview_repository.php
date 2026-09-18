@@ -36,7 +36,8 @@ final class progress_overview_repository
 
         $params = array_merge($userfields->params, $enrolledparams, $useridparams, $userorderparams);
 
-        $sql = "SELECT u.firstname,
+        $sql = "SELECT u.id AS userid,
+                    u.firstname,
                     u.lastname {$userfields->selects},
                     " . $this->get_timeaccess_date_sql("ul.timeaccess") . " AS lastaccess,
                     coalesce(uc.completion, 0)

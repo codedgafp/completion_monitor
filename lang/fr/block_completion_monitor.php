@@ -68,7 +68,8 @@ $string['page_title'] = $title;
 $string['loading'] = "Chargement en cours ...";
 $string['table_header_lastaccess'] = "Dernière visite";
 $string['table_header_completion'] = "Progression";
-$string['table_activity_progress'] = "Progression par activité";
+$string['table_header_activity_progress'] = "Progression par activité";
+$string['export_header_activity_progress'] = 'Progression: {$a}';
 
 // Task
 $string['task_update_users_course_completion'] = 'Mise à jour du pourcentage de complétion des cours';
