@@ -57,6 +57,8 @@ define([
         }
 
         _bindEvents() {
+            let $lastactivity = Array.from(this.items.values()).pop();
+
             this.$el.on('progressbar:item:select', (e, vm) => {
                 this.$el.trigger('progressbar:list:select', [vm]);
             });
@@ -64,7 +66,6 @@ define([
             this.$el.on('keydown', '.progressbar-item', (e) => {
 
                 if (e.key === 'Tab' && !e.shiftKey) {
-
                     const $item = $(e.currentTarget);
                     const isActive = $item.attr('aria-current') === 'true';
 
@@ -77,6 +78,14 @@ define([
                             $link.trigger('focus');
                             return;
                         }
+                    }
+
+                    const $legendButton = $('.block_completion_monitor .progressbar_legend-toggle');
+
+                    if ($legendButton.length && $lastactivity.$el.is($item)) {
+                        e.preventDefault();
+
+                        $legendButton.focus();
                     }
                 }
 
