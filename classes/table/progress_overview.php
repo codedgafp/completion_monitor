@@ -81,6 +81,8 @@ class progress_overview extends \table_sql implements dynamic
             "activityprogress" => get_string('table_header_activity_progress', 'block_completion_monitor'),
         ]);
 
+        $this->set_caption(get_string('table_caption', 'block_completion_monitor'), null);
+
         $this->define_table_layout($headers, $columns, $tablelayout);
 
         $this->define_columns($columns);
@@ -135,7 +137,9 @@ class progress_overview extends \table_sql implements dynamic
 
     public function col_completion($data): string
     {
-        return $data->completion ? (string) $data->completion : "0";
+        $completion = $data->completion ? (string) $data->completion : "0";
+
+        return "$completion %";
     }
 
     public function col_activityprogress($data) {

@@ -84,7 +84,7 @@ define([
 
             if (vm.opennewtab) 
                 this.$container.find('.progressbar_detail-link').attr('target', '_blank');
-                this.$container.find('.progressbar_detail-link').attr('tabindex', '0');
+                this.$container.find('.progressbar_detail-link').attr('tabindex', '-1');
 
             this._bindDetailTabTrap();
             this._notifyItem(this.activity, true);

@@ -2,11 +2,12 @@
 
 namespace block_completion_monitor\model;
 
-use block_completion_monitor\helper\progress;
-use block_completion_monitor\service\completion_activities_service;
-use block_completion_monitor\service\completion_monitor_service;
-use block_completion_monitor\repository\completion_monitor_repository;
+use core\context\course;
 use core_completion\cm_completion_details;
+use block_completion_monitor\helper\progress;
+use block_completion_monitor\service\completion_monitor_service;
+use block_completion_monitor\service\completion_activities_service;
+use block_completion_monitor\repository\completion_monitor_repository;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -54,6 +55,8 @@ class activity_details
 
     private ?string $status = null;
 
+    private course|false $coursecontext = false;
+
     private bool $opennewtab = false;
 
     private bool $issectionurl = false;
@@ -70,6 +73,8 @@ class activity_details
         if ($completioninfo == null) {
             $completioninfo = new \completion_info($course);
         }
+
+        $this->coursecontext = \context_course::instance($course->id);
 
         $this->id = $cm->id;
         $this->instance = $cm->instance;
@@ -241,7 +246,9 @@ class activity_details
                 ? !in_array(false, $availability->showc)
                 : $availability->show;
 
-            return $available ? self::LOCKED : self::HIDE;
+            $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $this->coursecontext, $this->user->id);
+
+            return $available ? self::LOCKED : ($canviewhiddenactivities ? self::LOCKED : self::HIDE);
         }
 
         $completionviewed = $service->course_module_has_beed_viewed($userid, $cm->id) ? COMPLETION_INCOMPLETE : null;
@@ -286,6 +293,13 @@ class activity_details
 
     private function showurl($cm): string
     {
+        global $USER;
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $this->coursecontext, $USER->id);
+
+        if (in_array($this->status, [self::LOCKED, self::HIDE]) && !$canviewhiddenactivities) {
+            return false;
+        }
+
         if ($cm->modname === 'scorm' && $this->opennewtab) {
             $url = new \moodle_url('/local/mentor_core/pages/scorm.php', ['cmid' => $cm->id]);
             return $url->out(false);
@@ -300,9 +314,6 @@ class activity_details
 
             return '';
         } else {
-            $coursecontext = \context_course::instance($cm->course);
-            $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $this->user->id);
-
             $isurloutmethodexists = method_exists($cm->url, 'out');
 
             if (!$isurloutmethodexists || $this->status === self::LOCKED && !$canviewhiddenactivities) {

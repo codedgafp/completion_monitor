@@ -57,8 +57,6 @@ define([
         }
 
         _bindEvents() {
-            let $lastactivity = Array.from(this.items.values()).pop();
-
             this.$el.on('progressbar:item:select', (e, vm) => {
                 this.$el.trigger('progressbar:list:select', [vm]);
             });
@@ -70,22 +68,14 @@ define([
                     const isActive = $item.attr('aria-current') === 'true';
 
                     if (isActive) {
-                        const $detail = $('#progressbar_detail');
+                        const $detail = $item.closest('.progressbar_wrapper').find('#progressbar_detail');
                         const $link = $detail.find('.progressbar_detail-link');
 
                         if ($link.length) {
                             e.preventDefault();
-                            $link.trigger('focus');
+                            $link.focus();
                             return;
                         }
-                    }
-
-                    const $legendButton = $('.block_completion_monitor .progressbar_legend-toggle');
-
-                    if ($legendButton.length && $lastactivity.$el.is($item)) {
-                        e.preventDefault();
-
-                        $legendButton.focus();
                     }
                 }
 

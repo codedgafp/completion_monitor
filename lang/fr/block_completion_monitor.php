@@ -62,10 +62,11 @@ $string['hide_legend'] = 'Masquer la légende';
 $string['viewsection'] = 'Aller à la section';
 
 // Suivi de progression
-$title = 'Suivi des données de progression';
+$title = 'suivi des données de progression';
 $string['page_header_title'] = '{$a}: ' . $title;
-$string['page_title'] = $title;
+$string['page_title'] = ucfirst($title);
 $string['loading'] = "Chargement en cours ...";
+$string['table_caption'] = "Tableau du $title";
 $string['table_header_lastaccess'] = "Dernière visite";
 $string['table_header_completion'] = "Progression";
 $string['table_header_activity_progress'] = "Progression par activité";

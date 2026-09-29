@@ -63,10 +63,11 @@ $string['hide_legend'] = 'Hide legend';
 $string['viewsection'] = 'View section';
 
 // Progress overview page
-$title = 'Tracking progress data';
+$title = 'tracking progress data';
 $string['page_header_title'] = '{$a}: ' . $title;
-$string['page_title'] = $title;
+$string['page_title'] = ucfirst($title);
 $string['loading'] = "Loading ...";
+$string['table_caption'] = "Table of $title";
 $string['table_header_lastaccess'] = "Last access";
 $string['table_header_completion'] = "Course progress";
 $string['table_header_activity_progress'] = "Progress by activity";
