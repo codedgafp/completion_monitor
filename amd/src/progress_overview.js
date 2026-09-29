@@ -53,8 +53,6 @@ define([
             this.checkAllButton();
             this.refreshedTable();
 
-            CustomEvents.define(Selectors.bulkactionselect, [CustomEvents.events.accessibleChange]);
-
             this.bulkActionsSelected();
         },
 
@@ -166,6 +164,8 @@ define([
                         return;
                     })
                     .catch(Notification.exception);
+
+                this.bulkActionsSelected();
             });
         },
 
@@ -186,6 +186,8 @@ define([
          * If the user choose an action to processed, submit the form.
          */
         bulkActionsSelected: function () {
+            CustomEvents.define(Selectors.bulkactionselect, [CustomEvents.events.accessibleChange]);
+
             $(Selectors.bulkactionselect).on(CustomEvents.events.accessibleChange, e => {
                 const bulkActionSelect = e.target.closest('select');
                 const action = bulkActionSelect.value;
