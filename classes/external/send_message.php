@@ -61,7 +61,6 @@ class send_message extends external_api
 
         foreach (array_unique($params['userids']) as $userid) {
             if ($userid == $USER->id) {
-                $failed[] = $userid;
                 continue;
             }
 
@@ -72,8 +71,7 @@ class send_message extends external_api
                 continue;
             }
 
-            if (!$touser || $touser->deleted || $touser->suspended) {
-                $failed[] = $userid;
+            if ($touser->deleted || $touser->suspended) {
                 continue;
             }
 
