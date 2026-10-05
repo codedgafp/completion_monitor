@@ -82,26 +82,12 @@ define([
 
                     this.manageBulkActionSelect();
 
-                    const tableRoot = getTableFromUniqueId(this.tableId);
-                    if (!tableRoot) {
-                        return;
+                    const selectAllInput = form.querySelector('#selectall');
+                    if (selectAllInput) {
+                        selectAllInput.value = '1';
                     }
 
-                    DynamicTable.setPageSize(tableRoot, checkAllButton.dataset.targetPageSize)
-                        .then(tableRoot => {
-                            // Update all checkbox state.
-                            CheckboxToggleAll.setGroupState(form, 'progress-overview-table', true);
-
-                            return tableRoot;
-                        })
-                        .catch(Notification.exception);
-
-                    // Disable the "Select all" button
-                    Str.get_string('loading', 'block_completion_monitor')
-                        .then(function (str) {
-                            checkAllButton.value = str;
-                        })
-                        .catch(Notification.exception);
+                    CheckboxToggleAll.setGroupState(form, 'progress-overview-table', true);
 
                     checkAllButton.setAttribute("disabled", "disabled");
                 }

@@ -44,6 +44,22 @@ class completion_monitor_service
      */
     protected moodle_database $db;
 
+    /**
+     * Viewed course modules already read during this request, keyed by user id.
+     * @var array<int, array<int, bool>>
+     */
+    private static array $viewedcache = [];
+
+    /**
+     * Empty the request level cache. Intended for unit tests.
+     *
+     * @return void
+     */
+    public static function reset_caches(): void
+    {
+        self::$viewedcache = [];
+    }
+
     public function __construct(
         private \stdClass $course
     ) {
@@ -72,8 +88,40 @@ class completion_monitor_service
      */
     public function course_module_has_beed_viewed(int $userid, int $cmid): bool
     {
-        $preferencename = $this->course_module_viewed_preference_name($userid, $cmid);
-        return $this->db->record_exists('user_preferences', ['name' => $preferencename]);
+        return isset($this->get_viewed_course_modules($userid)[$cmid]);
+    }
+
+    /**
+     * @param int $userid
+     * @return array<int, bool>
+     */
+    private function get_viewed_course_modules(int $userid): array
+    {
+        if (isset(self::$viewedcache[$userid])) {
+            return self::$viewedcache[$userid];
+        }
+
+        self::$viewedcache[$userid] = [];
+
+        $names = [];
+        foreach (get_fast_modinfo($this->course)->get_cms() as $cm) {
+            $names[$this->course_module_viewed_preference_name($userid, (int) $cm->id)] = (int) $cm->id;
+        }
+
+        if (empty($names)) {
+            return self::$viewedcache[$userid];
+        }
+
+        [$insql, $params] = $this->db->get_in_or_equal(array_keys($names), SQL_PARAMS_NAMED);
+        $found = $this->db->get_fieldset_select('user_preferences', 'name', "name $insql", $params);
+
+        foreach ($found as $name) {
+            if (isset($names[$name])) {
+                self::$viewedcache[$userid][$names[$name]] = true;
+            }
+        }
+
+        return self::$viewedcache[$userid];
     }
 
     /**

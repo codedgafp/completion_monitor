@@ -123,11 +123,11 @@ class completion_activities_service
      * @param course_modinfo|null $modinfo
      * @return activity_details[]
      */
-    public function get_activities_details(course_modinfo $modinfo = null, ?int $userid = null, bool $isprogressoverview = false): array
+    public function get_activities_details(course_modinfo $modinfo = null, ?int $userid = null, bool $isprogressoverview = false, bool $statusonly = false): array
     {
         global $USER;
 
-        $user = $userid === null ? $USER : get_complete_user_data("id", $userid, true);
+        $user = $userid === null ? $USER : (object) ['id' => $userid];
 
         $coursecompletion = new \completion_info($this->course);
         $coursecompletionactivities = $coursecompletion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
@@ -168,11 +168,11 @@ class completion_activities_service
                 continue;
 
             if (isset($cm->availability) && $available) {
-                $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
+                $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections, $statusonly);
                 continue;
             }
 
-            $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections);
+            $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections, $statusonly);
         }
 
         return $activities;
@@ -184,7 +184,8 @@ class completion_activities_service
         object      $coursecompletion,
         array       $coursecompletioncriterialist,
         array       $coursecompletionactivities,
-        array       $sections
+        array       $sections,
+        bool        $statusonly = false
     ): activity_details {
         $module = $cm->modname;
         $required = $this->is_activity_required(
@@ -194,7 +195,7 @@ class completion_activities_service
             $coursecompletionactivities
         );
 
-        $activitydetails = new activity_details($cm, $user, $coursecompletion);
+        $activitydetails = new activity_details($cm, $user, $coursecompletion, $statusonly);
         $activitydetails->set_type($module);
         $activitydetails->set_modulename($cm->get_module_type_name());
         $activitydetails->set_position(array_search($cm->id, $sections[$cm->sectionnum]));

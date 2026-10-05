@@ -35,7 +35,13 @@ final class progress_overview_content_service
                 'id' => 'checkall',
                 'class' => 'btn btn-secondary',
                 'value' => $label,
-                'data-target-page-size' => TABLE_SHOW_ALL_PAGE_SIZE,
+            ]);
+
+            $checkallhtml .= \html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'id' => 'selectall',
+                'name' => 'selectall',
+                'value' => '0',
             ]);
         }
 

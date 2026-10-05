@@ -8,6 +8,7 @@ use core_table\dynamic;
 use core\output\checkbox_toggleall;
 use core_table\local\filter\filterset;
 use block_completion_monitor\service\completion_activities_service;
+use block_completion_monitor\service\progress_export_service;
 use block_completion_monitor\service\progress_overview_content_service;
 
 defined('MOODLE_INTERNAL') || die;
@@ -37,6 +38,28 @@ class progress_overview extends \table_sql implements dynamic
      * @var \moodle_url $baseurl
      */
     public $baseurl;
+
+    /**
+     * The course record, resolved once for the whole table.
+     * @var \stdClass|null $overviewcourse
+     */
+    protected ?\stdClass $overviewcourse = null;
+
+    /**
+     * The activities service, built once for the whole table.
+     * @var completion_activities_service|null $activitiesservice
+     */
+    protected ?completion_activities_service $activitiesservice = null;
+
+    /**
+     * @var array|null $activitytemplates
+     */
+    protected ?array $activitytemplates = null;
+
+    /**
+     * @var progress_export_service|null $exportservice
+     */
+    protected ?progress_export_service $exportservice = null;
 
     /**
      * Function that configures the table and must be called for it to be displayed.
@@ -145,16 +168,37 @@ class progress_overview extends \table_sql implements dynamic
     public function col_activityprogress($data) {
         global $OUTPUT;
 
-        $course = get_course($this->courseid);
-        $service = new completion_activities_service($course);
+        if ($this->overviewcourse === null) {
+            $this->overviewcourse = get_course($this->courseid);
+            $this->activitiesservice = new completion_activities_service($this->overviewcourse);
+
+            $this->activitytemplates = [];
+            foreach ($this->activitiesservice->get_activities_details() as $activity) {
+                $this->activitytemplates[(int) $activity->get_id()] = $activity->buildrecord();
+            }
+
+            $this->exportservice = new progress_export_service(
+                $this->overviewcourse,
+                array_keys($this->activitytemplates),
+                array_keys($this->rawdata)
+            );
+        }
 
         $userid = (int) $data->id;
-        $modinfo = get_fast_modinfo($course, $userid);
+        $details = [];
 
-        $activities = $service->get_activities_details($modinfo, $userid, true);
-        $options["activities_details"] = array_map(fn(/** @var activity_details */ $activity) => $activity->buildrecord(), $activities);
+        foreach ($this->activitytemplates as $cmid => $record) {
+            $record['status'] = $this->exportservice->get_status($cmid, $userid);
+            $record['completionconditions'] = '';
+            $record['courseid'] = $this->courseid;
+            $record['userid'] = $userid;
+            $details[] = $record;
+        }
 
-        return $OUTPUT->render_from_template('block_completion_monitor/progress_overview/progress_bar', $options);
+        return $OUTPUT->render_from_template(
+            'block_completion_monitor/progress_overview/progress_bar',
+            ['activities_details' => $details]
+        );
     }
 
     /**

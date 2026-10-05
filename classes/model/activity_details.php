@@ -61,14 +61,71 @@ class activity_details
 
     private bool $issectionurl = false;
 
+    /**
+     * Capability checks already resolved during this request, keyed by "contextid-userid".
+     * @var array<string, bool>
+     */
+    private static array $canviewhiddencache = [];
+
+    /**
+     * Course records already read during this request, keyed by course id.
+     * @var array<int, \stdClass>
+     */
+    private static array $coursecache = [];
+
+    /**
+     * @param int $courseid
+     * @return \stdClass
+     */
+    private static function get_cached_course(int $courseid): \stdClass
+    {
+        if (!isset(self::$coursecache[$courseid])) {
+            self::$coursecache[$courseid] = get_course($courseid);
+        }
+
+        return self::$coursecache[$courseid];
+    }
+
+    /**
+     * Empty the request level cache. Intended for unit tests.
+     *
+     * @return void
+     */
+    public static function reset_caches(): void
+    {
+        self::$canviewhiddencache = [];
+        self::$coursecache = [];
+    }
+
+    /**
+     * @param \context $context
+     * @param int $userid
+     * @return bool
+     */
+    private static function can_view_hidden_activities(\context $context, int $userid): bool
+    {
+        $key = $context->id . '-' . $userid;
+
+        if (!isset(self::$canviewhiddencache[$key])) {
+            self::$canviewhiddencache[$key] = has_capability('moodle/course:viewhiddenactivities', $context, $userid);
+        }
+
+        return self::$canviewhiddencache[$key];
+    }
+
+    /**
+     * @param \cm_info $cm
+     * @param \stdClass $user
+     * @param \completion_info|null $completioninfo
+     * @param bool $statusonly
+     */
     public function __construct(
         \cm_info $cm,
         protected \stdClass $user,
-        \completion_info $completioninfo = null
+        \completion_info $completioninfo = null,
+        bool $statusonly = false
     ) {
-        $course = get_course($cm->course);
-
-        $service = new completion_activities_service($course);
+        $course = self::get_cached_course((int) $cm->course);
 
         if ($completioninfo == null) {
             $completioninfo = new \completion_info($course);
@@ -78,14 +135,21 @@ class activity_details
 
         $this->id = $cm->id;
         $this->instance = $cm->instance;
-        $this->name = format_string($cm->name);
         $this->expected = $cm->completionexpected;
         $this->section = $cm->sectionnum;
         $this->context = $cm->context;
-        $this->icon = $cm->get_icon_url();
         $this->available = $cm->available;
+        $this->status = $this->get_completion_state_by_activity_id($course, $cm, $completioninfo);
+
+        if ($statusonly) {
+            return;
+        }
+
+        $service = new completion_activities_service($course);
+
+        $this->name = format_string($cm->name);
+        $this->icon = $cm->get_icon_url();
         $this->completionconditions = json_encode($this->get_activity_completion_conditions($cm, $completioninfo));
-        $this->status = $this->get_completion_state_by_activity_id($course, $cm);
         $this->opennewtab = $service->set_opennewtab_for_scorm($cm);
         $this->url = $this->showurl($cm);
         $this->issectionurl = $this->is_section_url();
@@ -228,12 +292,16 @@ class activity_details
      * @param \cm_info $cm
      * @return string
      */
-    private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm): string
+    private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm, \completion_info $completioninfo = null): string
     {
         $service = new completion_monitor_service($course);
 
         $userid = $this->user->id;
-        $completioninfo = new \completion_info($course);
+
+        if ($completioninfo === null) {
+            $completioninfo = new \completion_info($course);
+        }
+
         $completion = $completioninfo->get_data($cm, true, $userid);
 
         if ((int) $cm->visible === 0) {
@@ -246,7 +314,7 @@ class activity_details
                 ? !in_array(false, $availability->showc)
                 : $availability->show;
 
-            $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $this->coursecontext, $this->user->id);
+            $canviewhiddenactivities = self::can_view_hidden_activities($this->coursecontext, (int) $this->user->id);
 
             return $available ? self::LOCKED : ($canviewhiddenactivities ? self::LOCKED : self::HIDE);
         }

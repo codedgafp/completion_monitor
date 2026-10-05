@@ -1,4 +1,4 @@
-define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], function ($, Utils, Str) {
+define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str', 'core/ajax'], function ($, Utils, Str, Ajax) {
     'use strict';
     const { getColorClass, I18N_MAP, COMPONENT, ICON_MAP, SHAPE_MAP, SERVER_KEYS } = Utils;
 
@@ -53,11 +53,54 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
             });
         }
 
+        _fetchConditions() {
+            const courseid = parseInt(this.$el.attr('data-courseid'), 10);
+            const userid = parseInt(this.$el.attr('data-userid'), 10);
+            const cmid = parseInt(this.$el.data('id'), 10);
+
+            if (!courseid || !userid || !cmid) {
+                return Promise.resolve([]);
+            }
+
+            return Ajax.call([{
+                methodname: 'block_completion_monitor_get_completion_conditions',
+                args: {courseid: courseid, userid: userid, cmid: cmid},
+            }])[0].then(response => response.conditions).catch(() => []);
+        }
+
+        _resolveConditions() {
+            if (this.completionconditions) {
+                return Promise.resolve(this.completionconditions);
+            }
+
+            const raw = this.$el.attr('data-conditions');
+
+            if (typeof raw === 'string' && raw !== '') {
+                this.completionconditions = JSON.parse(raw || '[]');
+                return Promise.resolve(this.completionconditions);
+            }
+
+            return this._fetchConditions().then(conditions => {
+                this.completionconditions = conditions;
+                return conditions;
+            });
+        }
+
         _bindEvents() {
             this.$el.on('click', (e) => {
-                this.completionconditions = this.completionconditions ?? JSON.parse(this.$el.attr('data-conditions') || '[]');
+                this._resolveConditions().then(() => this._triggerSelect()).catch(() => this._triggerSelect());
+            });
 
-                this.$el.trigger('progressbar:item:select', [{
+            this.$el.on('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.$el.trigger('click');
+                }
+            });
+        }
+
+        _triggerSelect() {
+            this.$el.trigger('progressbar:item:select', [{
                     id: this.$el.data('id'),
                     name: this.$el.data('name'),
                     type: this.$el.data('type'),
@@ -67,17 +110,9 @@ define(['jquery', 'block_completion_monitor/utils/activity_utils', 'core/str'], 
                     icon: this.$el.data('icon'),
                     status: this.status,
                     required: this.required,
-                    completionconditions: this.completionconditions,
+                    completionconditions: this.completionconditions || [],
                     el: this.$el,
                 }]);
-            });
-
-            this.$el.on('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.$el.trigger('click');
-                }
-            });
             this.isActive = false;
             this.$el.on('progressbar:detail:opened', () => {
                 this.isActive = true;

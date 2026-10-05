@@ -41,7 +41,11 @@ if ($formaction == 'bulkchange.php') {
 
     $dataformat = $url->param('dataformat');
 
+    $selectall = false;
+
     if ($post = data_submitted()) {
+        $selectall = !empty($post->selectall);
+
         foreach ($post as $k => $v) {
             if (preg_match('/^user(\d+)$/', $k, $m)) {
                 $userids[] = $m[1];
@@ -49,14 +53,14 @@ if ($formaction == 'bulkchange.php') {
         }
     }
 
-    if (isset($userids) && empty($userids)) {
+    if (!$selectall && isset($userids) && empty($userids)) {
         redirect($returnurl, get_string('noselectedusers', 'bulkusers'));
     }
 
     $service = new progress_overview_service($courseid, $context);
 
     if ($operationname == 'download_progress_users') {
-        $service->download_progress_overview_users($dataformat, $userids);
+        $service->download_progress_overview_users($dataformat, $userids ?? [], $selectall);
     }
 } else {
     throw new coding_exception('invalidaction');

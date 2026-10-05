@@ -39,12 +39,19 @@ final class progress_overview_service
      * @param array $userids
      * @return void
      */
-    public function download_progress_overview_users($dataformat, array $userids): void
+    public function download_progress_overview_users($dataformat, array $userids, bool $selectall = false): void
     {
         // Check permissions.
         $pagecontext = ($this->courseid == SITEID) ? \context_system::instance() : $this->context;
 
         if (course_can_view_participants($pagecontext)) {
+            \core_php_time_limit::raise();
+
+            if ($selectall) {
+                [$enrolledsql, $enrolledparams] = get_enrolled_sql($this->context);
+                $userids = $this->db->get_fieldset_sql("SELECT je.id FROM ($enrolledsql) je", $enrolledparams);
+            }
+
             $plugins = \core_plugin_manager::instance()->get_plugins_of_type('dataformat');
 
             if (isset($plugins[$dataformat]) && $plugins[$dataformat]->is_enabled()) {
@@ -67,9 +74,13 @@ final class progress_overview_service
 
                 $completionactivitiesservice = new completion_activities_service($this->course);
                 $activities = $completionactivitiesservice->get_activities_details();
+                $cmids = [];
                 foreach ($activities as $index => $activity) {
                     $columnnames["progress_activity_$index"] = get_string('export_header_activity_progress', 'block_completion_monitor', $activity->get_name());
+                    $cmids[$index] = (int) $activity->get_id();
                 }
+
+                $exportservice = new progress_export_service($this->course, $cmids, $userids);
 
                 $userstodownload = $this->repository->get_users_to_download($this->context, $userids, $userfields, $this->courseid);
 
@@ -79,19 +90,19 @@ final class progress_overview_service
                     $dataformat,
                     $columnnames,
                     $userstodownload,
-                    function (\stdClass $record, bool $supportshtml) use ($identityfields, $completionactivitiesservice): \stdClass {
+                    function (\stdClass $record, bool $supportshtml) use ($identityfields, $exportservice, $cmids): \stdClass {
                         if ($supportshtml) {
                             foreach ($identityfields as $identityfield) {
                                 $record->{$identityfield} = s($record->{$identityfield});
                             }
                         }
 
-                        $modinfo = get_fast_modinfo($this->course, $record->userid);
-                        $activities = $completionactivitiesservice->get_activities_details($modinfo, $record->userid, true);
-
-                        foreach ($activities as $index => $activity) {
+                        foreach ($cmids as $index => $cmid) {
                             $indexname = "progress_activity_$index";
-                            $record->$indexname = get_string($activity->get_status(), 'block_completion_monitor');
+                            $record->$indexname = get_string(
+                                $exportservice->get_status($cmid, (int) $record->userid),
+                                'block_completion_monitor'
+                            );
                         }
 
                         unset($record->userid);

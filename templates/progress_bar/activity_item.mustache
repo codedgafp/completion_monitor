@@ -28,7 +28,9 @@
     data-opennewtab="{{opennewtab}}"
     data-status="{{status}}"
     data-required="{{#required}}1{{/required}}{{^required}}0{{/required}}"
-    data-conditions="{{completionconditions}}"
+    data-courseid="{{courseid}}"
+    data-userid="{{userid}}"
+    {{#completionconditions}}data-conditions="{{completionconditions}}"{{/completionconditions}}
 >
     {{#icon_name}}
         <i class="fa fa-{{icon_name}}" aria-hidden="true"></i>

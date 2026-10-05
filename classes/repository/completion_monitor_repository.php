@@ -20,10 +20,33 @@ class completion_monitor_repository
      */
     protected \moodle_database $db;
 
+    /**
+     * Submissions already read during this request, keyed by "courseid-userid".
+     * @var array<string, array>
+     */
+    private static array $submissionscache = [];
+
+    /**
+     * Scorm records already read during this request, keyed by course module id.
+     * @var array<int, mixed>
+     */
+    private static array $scormcache = [];
+
     public function __construct()
     {
         global $DB;
         $this->db = $DB;
+    }
+
+    /**
+     * Empty the request level caches. Intended for unit tests.
+     *
+     * @return void
+     */
+    public static function reset_caches(): void
+    {
+        self::$submissionscache = [];
+        self::$scormcache = [];
     }
 
     /**
@@ -70,6 +93,12 @@ class completion_monitor_repository
     {
         global $DB;
 
+        $cachekey = $courseid . '-' . $userid;
+
+        if (isset(self::$submissionscache[$cachekey])) {
+            return self::$submissionscache[$cachekey];
+        }
+
         $submissionsvalues = [];
         $submissionslist = [];
 
@@ -86,6 +115,8 @@ class completion_monitor_repository
         }
 
         ksort($submissionslist);
+
+        self::$submissionscache[$cachekey] = $submissionslist;
 
         return $submissionslist;
     }
@@ -291,13 +322,19 @@ class completion_monitor_repository
 
     public function get_scorm_by_coursemoduleid(int $cmid): ?object
     {
-        return $this->db->get_record_sql('
+        if (array_key_exists($cmid, self::$scormcache)) {
+            return self::$scormcache[$cmid];
+        }
+
+        self::$scormcache[$cmid] = $this->db->get_record_sql('
                                 SELECT s.*
                                 FROM {scorm} s
                                 JOIN {course_modules} cm ON cm.instance = s.id
                                 WHERE
                                 cm.id = :cmid
                             ', ['cmid' => $cmid]);
+
+        return self::$scormcache[$cmid];
     }
 
     /**
