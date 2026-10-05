@@ -255,7 +255,7 @@ class progress_overview extends \table_sql implements dynamic
      */
     public function guess_base_url(): void
     {
-        $this->baseurl = new \moodle_url('blocks/completion_monitor/progress_overview.php', ['courseid' => $this->courseid]);
+        $this->baseurl = new \moodle_url('/blocks/completion_monitor/progress_overview.php', ['courseid' => $this->courseid]);
     }
 
     /**
