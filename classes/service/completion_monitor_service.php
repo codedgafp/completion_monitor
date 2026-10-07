@@ -61,14 +61,17 @@ class completion_monitor_service
     }
 
     public function __construct(
-        private \stdClass $course
+        private ?\stdClass $course = null
     ) {
         global $DB;
-
-        $this->contextcourse = context_course::instance($this->course->id);
-        $this->accmrepository = new completion_monitor_repository();
-        $this->completionactivitiesservice = new completion_activities_service($this->course);
         $this->db = $DB;
+
+        $this->accmrepository = new completion_monitor_repository();
+
+        if ($course !== null) {
+            $this->contextcourse = context_course::instance($this->course->id);
+            $this->completionactivitiesservice = new completion_activities_service($this->course);
+        }
     }
 
     /**
@@ -153,5 +156,18 @@ class completion_monitor_service
     public function is_user_course_manager(int $userid)
     {
         return has_capability('moodle/course:manageactivities', $this->contextcourse, $userid);
+    }
+
+    public function delete_duplicates_users_completion(array $duplicates)
+    {
+        foreach ($duplicates as $usercompletion) {
+            $this->db->delete_records(
+                'user_completion',
+                [
+                    "userid" => $usercompletion->userid,
+                    "courseid" => $usercompletion->courseid
+                ]
+            );
+        }
     }
 }
