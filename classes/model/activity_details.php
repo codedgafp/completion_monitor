@@ -298,9 +298,7 @@ class activity_details
 
         $userid = $this->user->id;
 
-        if ($completioninfo === null) {
-            $completioninfo = new \completion_info($course);
-        }
+        $completioninfo ??= new \completion_info($course);
 
         $completion = $completioninfo->get_data($cm, true, $userid);
 

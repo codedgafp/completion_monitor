@@ -99,7 +99,7 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
         self::assertCount(0, $this->repository->get_grade_exclusions($course->id));
     }
 
-    public function test_get_user_course_submissions()
+    public function test_get_no_user_course_submissions()
     {
         self::setAdminUser();
 
@@ -115,6 +115,21 @@ class block_completion_monitor_repository_testcase extends advanced_testcase
 
         $usersubmissions = $this->repository->get_user_course_submissions($course->id, $student->id);
         self::assertCount(0, $usersubmissions);
+
+        self::resetAllData();
+    }
+
+    public function test_get_user_course_submissions()
+    {
+        // Create course.
+        $courserecord = new stdClass();
+        $courserecord->enablecompletion = 1;
+        $course = $this->getDataGenerator()->create_course($courserecord);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'participant');
+
+        $record = new stdClass();
+        $record->course = $course;
+        $this->getDataGenerator()->create_module('forum', $record);
 
         // Create a mod with completion enabled.
         $instance = $this->getDataGenerator()->create_module('assign', [
