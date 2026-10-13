@@ -36,7 +36,7 @@ class progress_overview_search
 
         protected ?string $inneruseralias = null,
         protected ?string $subqueryalias = null,
-        protected ?array $queryparams = [],
+        protected array $queryparams = [],
 
         protected ?completion_monitor_repository $repository = null,
 

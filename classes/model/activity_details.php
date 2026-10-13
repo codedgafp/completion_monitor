@@ -15,15 +15,15 @@ class activity_details
 {
     use progress;
 
-    private const COMPLETED = 'completed';
+    private const string COMPLETED = 'completed';
 
-    private const INPROGRESS = 'in_progress';
+    private const string INPROGRESS = 'in_progress';
 
-    private const NOTSTARTED = 'not_started';
+    private const string NOTSTARTED = 'not_started';
 
-    private const LOCKED = 'locked';
+    private const string LOCKED = 'locked';
 
-    private const HIDE = 'hide';
+    private const string HIDE = 'hide';
 
     private ?string $type = null;
 
@@ -122,7 +122,7 @@ class activity_details
     public function __construct(
         \cm_info $cm,
         protected \stdClass $user,
-        \completion_info $completioninfo = null,
+        ?\completion_info $completioninfo = null,
         bool $statusonly = false
     ) {
         $course = self::get_cached_course((int) $cm->course);
@@ -292,7 +292,7 @@ class activity_details
      * @param \cm_info $cm
      * @return string
      */
-    private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm, \completion_info $completioninfo = null): string
+    private function get_completion_state_by_activity_id(\stdClass $course, \cm_info $cm, ?\completion_info $completioninfo = null): string
     {
         $service = new completion_monitor_service($course);
 

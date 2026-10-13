@@ -123,7 +123,7 @@ class completion_activities_service
      * @param course_modinfo|null $modinfo
      * @return activity_details[]
      */
-    public function get_activities_details(course_modinfo $modinfo = null, ?int $userid = null, bool $isprogressoverview = false, bool $statusonly = false): array
+    public function get_activities_details(?course_modinfo $modinfo = null, ?int $userid = null, bool $isprogressoverview = false, bool $statusonly = false): array
     {
         global $USER;
 

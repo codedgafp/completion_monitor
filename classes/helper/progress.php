@@ -32,7 +32,7 @@ trait progress
         return $completions;
     }
 
-    protected function get_completion_state(\stdClass $completion, \stdClass $submission = null)
+    protected function get_completion_state(\stdClass $completion, ?\stdClass $submission = null)
     {
         if ($completion->completionstate == COMPLETION_INCOMPLETE && $submission) {
             return ASSIGN_SUBMISSION_STATUS_SUBMITTED;

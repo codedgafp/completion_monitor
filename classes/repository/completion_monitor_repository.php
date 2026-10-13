@@ -56,7 +56,7 @@ class completion_monitor_repository
      * @param int $userid
      * @return array
      */
-    public function get_grade_exclusions(int $courseid, int $userid = null): array
+    public function get_grade_exclusions(int $courseid, ?int $userid = null): array
     {
         $sqlconcat = $this->db->sql_concat('i.itemmodule', "'-'", 'i.iteminstance', "'-'", 'g.userid');
 
@@ -129,7 +129,7 @@ class completion_monitor_repository
      * @param int $userid
      * @return array
      */
-    private function get_assign_individual_submission(int $courseid, int $userid = null): array
+    private function get_assign_individual_submission(int $courseid, ?int $userid = null): array
     {
         $assignwhere = '';
         $params['courseid'] = $courseid;
@@ -172,7 +172,7 @@ class completion_monitor_repository
      * @param mixed $userid
      * @return array
      */
-    private function get_assign_group_submission(int $courseid, int $userid = null): array
+    private function get_assign_group_submission(int $courseid, ?int $userid = null): array
     {
         $assignwhere = '';
         $params['courseid'] = $courseid;
@@ -213,7 +213,7 @@ class completion_monitor_repository
      * @param int $userid
      * @return array
      */
-    private function get_workshop_submission(int $courseid, int $userid = null): array
+    private function get_workshop_submission(int $courseid, ?int $userid = null): array
     {
         $workshopwhere = '';
         $params['courseid'] = $courseid;
@@ -245,7 +245,7 @@ class completion_monitor_repository
      * @param int $userid
      * @return array
      */
-    private function get_quiz_attempts(int $courseid, int $userid = null): array
+    private function get_quiz_attempts(int $courseid, ?int $userid = null): array
     {
         $quizwhere = '';
         $params = [
@@ -289,7 +289,7 @@ class completion_monitor_repository
      * @param int $userid
      * @return array
      */
-    private function get_quiz_attempts_grading_methods(int $courseid, int $userid = null): array
+    private function get_quiz_attempts_grading_methods(int $courseid, ?int $userid = null): array
     {
         $quizwhere = '';
         $params = [
