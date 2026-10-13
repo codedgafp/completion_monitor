@@ -372,10 +372,10 @@ class completion_monitor_repository
         if (!$count) {
             global $CFG;
 
-            $completionlimitresult = isset($CFG->completion_limit_result) ? $CFG->completion_limit_result : 10000;
+            $completionlimitresult = $CFG->completion_limit_result ?? 10000;
 
             $limitfrom = $lastrows;
-            $limitfrom = $completionlimitresult;
+            $limitnum = (int) $completionlimitresult;
         }
 
         $sql = "SELECT
@@ -447,5 +447,21 @@ class completion_monitor_repository
         ];
 
         return $this->db->get_fieldset_sql($sql, $params + $groupingparams);
+    }
+
+    /**
+     * Get duplicates "user_completion" rows.
+     * 
+     * @return array
+     */
+    public function get_duplicate_users_completion(): array
+    {
+        $sql = "SELECT userid, courseid, COUNT(*) AS nbr_doublon 
+                FROM {user_completion}
+                GROUP BY userid, courseid
+                HAVING COUNT(*) > 1
+                ";
+
+        return $this->db->get_records_sql($sql);
     }
 }

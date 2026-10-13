@@ -11,6 +11,7 @@ namespace block_completion_monitor\task;
 
 use block_completion_monitor\repository\completion_monitor_repository;
 use block_completion_monitor\service\completion_activities_service;
+use block_completion_monitor\service\completion_monitor_service;
 
 class update_users_course_completion extends \core\task\scheduled_task
 {
@@ -27,6 +28,18 @@ class update_users_course_completion extends \core\task\scheduled_task
 
         $repository = new completion_monitor_repository();
 
+        $this->log("Vérification de la présence de doublons.");
+
+        $getduplicateuserscompletion = $repository->get_duplicate_users_completion();
+
+        if (!empty($getduplicateuserscompletion)) {
+            $this->log("Des doublons ont été détectés. Ils vont être supprimés avant de continuer la tâche.");
+
+            $completionservice = new completion_monitor_service();
+
+            $completionservice->delete_duplicates_users_completion($getduplicateuserscompletion);
+        }
+
         $lastrows = 0;
         $totalprocessed = 0;
 
@@ -39,7 +52,7 @@ class update_users_course_completion extends \core\task\scheduled_task
 
         $this->log("Nombre total d'enregistrements à traiter : $countusercompletion");
 
-        $completionlimitresult = isset($CFG->completion_limit_result) ? $CFG->completion_limit_result : 10000;
+        $completionlimitresult = $CFG->completion_limit_result ?? 10000;
 
         $iterations = ceil($countusercompletion / $completionlimitresult);
 
@@ -60,10 +73,10 @@ class update_users_course_completion extends \core\task\scheduled_task
                 if (!$course || isset($updates[$uniquekey]))
                     continue;
 
-                $completionservice = new completion_activities_service($course);
+                $completionactivitiesservice = new completion_activities_service($course);
 
                 // Get the new completion
-                $newusercompletion = $completionservice->get_course_completion_details($userid)["percentage"];
+                $newusercompletion = $completionactivitiesservice->get_course_completion_details($userid)["percentage"];
 
                 $updates[$uniquekey] = [
                     'userid' => $userid,
