@@ -74,46 +74,6 @@ class activity_details
     private static array $coursecache = [];
 
     /**
-     * @param int $courseid
-     * @return \stdClass
-     */
-    private static function get_cached_course(int $courseid): \stdClass
-    {
-        if (!isset(self::$coursecache[$courseid])) {
-            self::$coursecache[$courseid] = get_course($courseid);
-        }
-
-        return self::$coursecache[$courseid];
-    }
-
-    /**
-     * Empty the request level cache. Intended for unit tests.
-     *
-     * @return void
-     */
-    public static function reset_caches(): void
-    {
-        self::$canviewhiddencache = [];
-        self::$coursecache = [];
-    }
-
-    /**
-     * @param \context $context
-     * @param int $userid
-     * @return bool
-     */
-    private static function can_view_hidden_activities(\context $context, int $userid): bool
-    {
-        $key = $context->id . '-' . $userid;
-
-        if (!isset(self::$canviewhiddencache[$key])) {
-            self::$canviewhiddencache[$key] = has_capability('moodle/course:viewhiddenactivities', $context, $userid);
-        }
-
-        return self::$canviewhiddencache[$key];
-    }
-
-    /**
      * @param \cm_info $cm
      * @param \stdClass $user
      * @param \completion_info|null $completioninfo
@@ -306,13 +266,13 @@ class activity_details
             return self::HIDE;
         }
 
-        if (isset($cm->availability)) {
+        $canviewhiddenactivities = self::can_view_hidden_activities($this->coursecontext, (int) $this->user->id);
+
+        if (isset($cm->availability) && ($canviewhiddenactivities || !$cm->is_visible_on_course_page())) {
             $availability = json_decode($cm->availability);
             $available = $availability->op == '&'
                 ? !in_array(false, $availability->showc)
                 : $availability->show;
-
-            $canviewhiddenactivities = self::can_view_hidden_activities($this->coursecontext, (int) $this->user->id);
 
             return $available ? self::LOCKED : ($canviewhiddenactivities ? self::LOCKED : self::HIDE);
         }
@@ -393,5 +353,45 @@ class activity_details
     private function is_section_url(): bool
     {
         return $this->url && strpos($this->url, '/course/section.php') !== false;
+    }
+
+    /**
+     * @param int $courseid
+     * @return \stdClass
+     */
+    private static function get_cached_course(int $courseid): \stdClass
+    {
+        if (!isset(self::$coursecache[$courseid])) {
+            self::$coursecache[$courseid] = get_course($courseid);
+        }
+
+        return self::$coursecache[$courseid];
+    }
+
+    /**
+     * Empty the request level cache. Intended for unit tests.
+     *
+     * @return void
+     */
+    public static function reset_caches(): void
+    {
+        self::$canviewhiddencache = [];
+        self::$coursecache = [];
+    }
+
+    /**
+     * @param \context $context
+     * @param int $userid
+     * @return bool
+     */
+    private static function can_view_hidden_activities(\context $context, int $userid): bool
+    {
+        $key = $context->id . '-' . $userid;
+
+        if (!isset(self::$canviewhiddencache[$key])) {
+            self::$canviewhiddencache[$key] = has_capability('moodle/course:viewhiddenactivities', $context, $userid);
+        }
+
+        return self::$canviewhiddencache[$key];
     }
 }

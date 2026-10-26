@@ -168,21 +168,19 @@ class progress_overview extends \table_sql implements dynamic
     public function col_activityprogress($data) {
         global $OUTPUT;
 
-        if ($this->overviewcourse === null) {
-            $this->overviewcourse = get_course($this->courseid);
-            $this->activitiesservice = new completion_activities_service($this->overviewcourse);
+        $this->overviewcourse = get_course($this->courseid);
+        $this->activitiesservice = new completion_activities_service($this->overviewcourse);
 
-            $this->activitytemplates = [];
-            foreach ($this->activitiesservice->get_activities_details() as $activity) {
-                $this->activitytemplates[(int) $activity->get_id()] = $activity->buildrecord();
-            }
-
-            $this->exportservice = new progress_export_service(
-                $this->overviewcourse,
-                array_keys($this->activitytemplates),
-                array_keys($this->rawdata)
-            );
+        $this->activitytemplates = [];
+        foreach ($this->activitiesservice->get_activities_details() as $activity) {
+            $this->activitytemplates[(int) $activity->get_id()] = $activity->buildrecord();
         }
+
+        $this->exportservice = new progress_export_service(
+            $this->overviewcourse,
+            array_keys($this->activitytemplates),
+            array_keys($this->rawdata)
+        );
 
         $userid = (int) $data->id;
         $details = [];

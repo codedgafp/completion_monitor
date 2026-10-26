@@ -148,26 +148,17 @@ class completion_activities_service
 
         // Create activities list with completion set.
         foreach ($coursemodules as $cm) {
-            $available = true;
-
             if ($cm->get_course_module_record()->deletioninprogress == 1) {
                 continue;
-            }
-
-            if (isset($cm->availability)) {
-                $availability = json_decode($cm->availability);
-                $available = $availability->op == '&'
-                    ? !in_array(false, $availability->showc)
-                    : $availability->show;
             }
 
             $hasnocompletion = $cm->completion === COMPLETION_TRACKING_NONE;
             $isvisible = $cm->visible;
 
-            if ($hasnocompletion || !$canviewhiddenactivities && (!$available || !$isvisible))
+            if (($hasnocompletion || !$canviewhiddenactivities) && (!$cm->is_visible_on_course_page() || !$isvisible))
                 continue;
 
-            if (isset($cm->availability) && $available) {
+            if (isset($cm->availability) && $cm->is_visible_on_course_page()) {
                 $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections, $statusonly);
                 continue;
             }
@@ -185,7 +176,7 @@ class completion_activities_service
         array       $coursecompletioncriterialist,
         array       $coursecompletionactivities,
         array       $sections,
-        bool        $statusonly = false
+        bool        $statusonly
     ): activity_details {
         $module = $cm->modname;
         $required = $this->is_activity_required(
