@@ -185,18 +185,3 @@ Une fois fait, ou si vous n'avez pas besoin d'ajouter une configuration supplém
 2. Choisir le dossier ZIP
 3. Moodle décompresse et vérifie la compatibilité
 4. Si tout est OK → Validation passée → continuer
-
-# Minifier les script JavaScripts
-
-Pour que Moodle puisse lire et exécuter les JavaScripts, il faut qu'ils soient minifié.
-
-Si c'est la première fois que vous initiez le plugin, ou si vous avez modifié / ajouté un fichier JavaScript, il est essentiel de lancer la commande de
-minification :
-
-```bash
-docker compose run --rm amd-minify
-```
-
-## Troubleshoot
-
-En cas d'erreur avec `<UNABLE_TO_GET_ISSUER_CERT_LOCALLY>`, changer l'image docker.

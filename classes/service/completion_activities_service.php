@@ -146,24 +146,33 @@ class completion_activities_service
         $usercapability = $isprogressoverview ? $USER : $user;
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext, $usercapability->id);
 
+        $skiphidden = !$canviewhiddenactivities;
+
         // Create activities list with completion set.
         foreach ($coursemodules as $cm) {
             if ($cm->get_course_module_record()->deletioninprogress == 1) {
                 continue;
             }
 
-            $hasnocompletion = $cm->completion === COMPLETION_TRACKING_NONE;
-            $isvisible = $cm->visible;
+            $hasnocompletion = $cm->completion == COMPLETION_TRACKING_NONE;
 
-            if (($hasnocompletion || !$canviewhiddenactivities) && (!$cm->is_visible_on_course_page() || !$isvisible))
-                continue;
-
-            if (isset($cm->availability) && $cm->is_visible_on_course_page()) {
-                $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections, $statusonly);
+            if ($hasnocompletion) {
                 continue;
             }
 
-            $activities[] = $this->build_activity_details($user, $cm, $coursecompletion, $coursecompletioncriterialist, $coursecompletionactivities, $sections, $statusonly);
+            if ($skiphidden && (!$cm->visible || !$cm->is_visible_on_course_page())) {
+                continue;
+            }
+
+            $activities[] = $this->build_activity_details(
+                $user,
+                $cm,
+                $coursecompletion,
+                $coursecompletioncriterialist,
+                $coursecompletionactivities,
+                $sections,
+                $statusonly
+            );
         }
 
         return $activities;
